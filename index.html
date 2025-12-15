@@ -1,6 +1,81 @@
 <!DOCTYPE html>
 <html lang="en-us">
 
+
+<style>
+/* ===== Compact Services spacing ===== */
+#services ul{
+  margin: 0 0 6px 18px;   /* 缩小每条之间的间距 */
+  padding: 0;
+}
+#services li{ margin: 0; padding: 0; }
+#services li p{
+  margin: 0;              /* 去掉 <p> 默认上下空白 */
+  line-height: 1.35;      /* 更紧凑的行高 */
+}
+</style>
+
+
+<style>
+/* ===== Compact Recent Publications (keep authors) ===== */
+#publications .pub-list-item { margin: 0 0 10px 0; padding: 0; }
+#publications .pub-list-item .row { margin: 0; }
+#publications .pub-list-item .col-md-12 { padding-left: 0; padding-right: 0; }
+
+/* Title: smaller + tighter */
+#publications .article-title{
+  font-size: 16px;
+  line-height: 1.35;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Authors: keep but compact */
+#publications .pub-authors{
+  font-size: 13px;
+  line-height: 1.35;
+  margin: 2px 0 0 0;
+  color: #555;
+}
+
+/* Abstract: hide */
+#publications .pub-abstract{ display: none; }
+
+/* Publication line: hide venue text but keep buttons/links */
+#publications .pub-publication{
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  line-height: 1.2;
+}
+#publications .pub-publication em{ display: none; } /* 只隐藏期刊/会议那行文字 */
+#publications .pub-publication a.btn{
+  padding: 1px 6px;
+  font-size: 11px;
+  line-height: 1.2;
+  margin-right: 6px;
+}
+
+/* Venue tag (optional) */
+#publications .venue-tag{
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1;
+  padding: 3px 8px;
+  border-radius: 10px;
+  margin-right: 8px;
+  font-weight: 700;
+  vertical-align: 2px;
+}
+#publications .venue-cvpr { background:#1f77b4; color:#fff; }
+#publications .venue-iccv { background:#9467bd; color:#fff; }
+#publications .venue-eccv { background:#17becf; color:#fff; }
+#publications .venue-tip  { background:#ff7f0e; color:#fff; }
+#publications .venue-tpami{ background:#2ca02c; color:#fff; }
+#publications .venue-mm   { background:#d62728; color:#fff; }
+#publications .venue-other{ background:#555; color:#fff; }
+</style>
+
+
 <head>
 
     <meta charset="utf-8">
@@ -95,7 +170,7 @@
 
                         <div class="portrait-title">
                             <h2 itemprop="name">Guo Lu</h2>
-                            <h3 itemprop="jobTitle">Assistant Professor</h3>
+                            <h3 itemprop="jobTitle">Associate Professor</h3>
                             <h3 itemprop="worksFor">Shanghai Jiao Tong University</h3>
                         </div>
 
@@ -134,19 +209,24 @@
 
                 <div class="col-xs-12 col-md-8" itemprop="description">
 
-                    <p><br></p>
 
-                    <p> I am an assistant professor at the Shanghai Jiao Tong University. Before that, I was an assistant professor at the Beijing Institute of Technology from 2020 to 2022. I obtained my Ph.D degree in the Department of Electronic Engineering, <a href="http://www.sjtu.edu.cn">Shanghai Jiao Tong University</a> at 2020. From Sep. 2017 to Mar. 2019, I was a visiting student in <a href="https://www.sydney.edu.au/"> the University of Sydney</a>  and work with <a href="https://scholar.google.com/citations?user=pw_0Z_UAAAAJ&hl=en">Wanli Ouyang </a>.
-                    I received the B. Eng. degree in the Department of Electronic Engineering, <a href="http://www.ouc.edu.cn">Ocean University of China</a>, 2014. My research interests focus on video compression, video processing and deep learning.
-                    <br>
-                    <span style="color:red"><strong>Looking for self-motivated students (both PhD and master) working with me. For prospective students, please send your resume and transcript to my email.</em>
-
-
+                    
+                        <p>
+                        I am a tenure-track Associate Professor (Ph.D. supervisor) in the Department of Electronic Engineering, Shanghai Jiao Tong University.
+                        Before joining SJTU, I was an Assistant Professor at the Beijing Institute of Technology (2020–2022).
+                        I received my Ph.D. degree in Electronic Engineering from <a href="http://www.sjtu.edu.cn">Shanghai Jiao Tong University</a> in 2020.
+                        From Sep. 2017 to Mar. 2019, I was a visiting researcher at <a href="https://www.sydney.edu.au/">the University of Sydney</a>, working with <a href="https://scholar.google.com/citations?user=pw_0Z_UAAAAJ&hl=en">Prof. Wanli Ouyang</a> and <a href="https://scholar.google.com/citations?user=7Hdu5k4AAAAJ&hl=zh-CN">Prof. Dong Xu</a>.
+                        My research interests include video coding, multimedia processing, and efficient multimodal large language models
+                        <br>
+                        I serve as an Associate Editor for IEEE Transactions on Circuits and Systems for Video Technology (T-CSVT) and as a Guest Editor for journals including IJCV.
+                        I have served as an Area Chair for major ML conferences (e.g., ICLR and NeurIPS), co-lead the AVS working group on 3D medical image coding, and have organized tutorials/workshops on intelligent compression at venues such as CVPR and ACM Multimedia.
+                        <br>
+                        My honors include the IEEE Visual Signal Processing and Communications Rising Star Award, best paper awards at conferences such as VCIP/WCSP, and outstanding doctoral dissertation awards (including awards from CSIG and Shanghai Jiao Tong University).
+                        <br>
+                        <span style="color:red"><strong>Looking for self-motivated Ph.D./M.S. students, research interns, and postdoctoral fellows to work with me. For prospective applicants, please send your CV/resume and transcript to my email.</strong></span>
+                        </p>
+                        <a href="https://icisee.sjtu.edu.cn/jiaoshiml/luguo.html">中文主页</a> 
                     <div class="row">
-
-
-
-
 
                     </div>
 
@@ -161,7 +241,7 @@
 
 
 
-    <section id="news" class="home-section">
+    <!-- <section id="news" class="home-section">
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-md-4 section-heading">
@@ -171,63 +251,14 @@
 
                 <div class="col-xs-12 col-md-8">
                     
-
-
                     <ul>
                         <li>09/2022, I join Shanghai Jiao Tong University as an assistant professor</li>
-                    </ul>
-
-
-                    <ul>
-                        <li>09/2022, Two papers are accepted to PCS 2022</li>
-                    </ul>
-
-                    <ul>
-                        <li>07/2022, One paper is accepted to TPAMI 2022.</li>
-                    </ul>
-
-                    <ul>
-                        <li>07/2022,One paper is accepted to ECCV 2022.</li>
-                    </ul>
-
-                    <ul>
-                        <li>03/2022,Three papers are accepted to CVPR 2022.</li>
-                    </ul>
-                    
-                    <ul>
-                        <li>03/2021, We are organizing a tutorial  <a href="https://guolu-home.github.io/cvpr21-tutorial">Learning for Visual Data Compression</a> on CVPR2021.</li>
-                    </ul>
-
-                    <ul>
-                        <li>03/2021, Two papers are accepted at CVPR2021.</li>
-                    </ul>
-
-                    <ul>
-                        <li>12/2020, We are organizing a tutorial on VCIP2020 for Learned Image and Video Compression. Please see the slides <a href="https://drive.google.com/file/d/1S7jd27s7GjDRCOfbPQyZb4rWnJH93gxE/view?usp=sharing">Learned Image Compression</a> and <a href="https://drive.google.com/file/d/162omgk0CmHPBj4J7vWsNr8N9SPn5j97F/view?usp=sharing">Learned Video Compression</a>.</li>
-                    </ul>
-
-                    <ul>
-                        <li>09/2020, We are organizing a special issue on IJCV for video understanding and video compression. Please see the <a href="https://guolusjtu.github.io/guoluhomepage/paper/IJCV-SI-DLVAC.pdf">CfP</a>.</li>
-                    </ul>
-
-                    <ul>
-                        <li>07/2020, Two oral papers are accepted at ECCV2020.</li>
-                    </ul>
-
-                    <ul>
-                        <li>03/2020, My homepage is online.</li>
                     </ul>
 
                 </div>
             </div>
         </div>
-
-
-
-
-
-
-    </section>
+    </section> -->
 
 
 
@@ -261,15 +292,15 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <h3 class="article-title" itemprop="name">
-                                    [PCS&#39;22] Perceptual Video Coding based on Semantic-guided Texture Detection and Synthesis
+                                    [Engineering&#39;25]  Generative Video Communications: Concepts, Key Technologies, and Future Research Trends 
                                 </h3>
                                 <div class="pub-abstract" itemprop="text">
                                 </div>
                                 <div class="pub-authors" itemprop="author">
-                                    Chen Zhu, <u>Guo Lu</u>, Rong Xie, Li Song
+                                    Wenjun Zhang, <u>Guo Lu</u>, Zhiyong Chen, GY Li
                                 </div>
                                 <div class="pub-publication">
-                                    <em>IIEEE Picture Coding Symposium (PCS), 2019.</em>                    
+                                    <em>Engineering, 2025.</em>                    
                                 </div>                                
                             </div>
                         </div>
@@ -281,16 +312,15 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <h3 class="article-title" itemprop="name">
-                                    [CVPR&#39;22] Learning Based Multi-Modality Image and Video Compression
+                                    [ICCV&#39;25] Knowledge Distillation for Learned Image Compression<span style="color:red"><strong>(Oral).</strong></span> 
                                 </h3>
                                 <div class="pub-abstract" itemprop="text">
                                 </div>
                                 <div class="pub-authors" itemprop="author">
-                                    <u>Guo Lu</u>, Tianxiong Zhong, Jing Geng, Qiang Hu, Dong Xu
+                                    Yunuo Chen, Zezheng Lyu, Bing He, Ning Cao, Gang Chen, <u>Guo Lu</u>, Wenjun Zhang
                                 </div>
                                 <div class="pub-publication">
-                                    <em>IEEE Conference on Computer Vision and Pattern Recognition (CVPR),2022. </em>
-                    
+                                    <em>ICCV 2025 . </em>
                                 </div>                                
                             </div>
                         </div>
@@ -301,12 +331,12 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <h3 class="article-title" itemprop="name">
-                                    [TIP&#39;22] TSA-SCC: text semantic-aware screen content coding with ultra low bitrate
+                                    [AAAI&#39;25] Controllable Distortion-Perception Tradeoff Through Latent Diffusion for Neural Image Compression
                                 </h3>
                                 <div class="pub-abstract" itemprop="text">
                                 </div>
                                 <div class="pub-authors" itemprop="author">
-                                    Tong Tang, Ling Li, Xiaoyu Wu, Ruizhi Chen, Haochen Li, <u>Guo Lu</u>, Limin Cheng
+                                  Chuqin Zhou, <u>Guo Lu</u>, Jiangchuan Li, Xiangyu Chen, Zhengxue Cheng, Li Song, Wenjun Zhang
                                 </div>
                                 <div class="pub-publication">
                                     <em>IEEE Transactions on Image Processing,2022</em>
@@ -320,15 +350,15 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <h3 class="article-title" itemprop="name">
-                                    [ICCV&#39;21] Self-Conditioned Probabilistic Learning of Video Rescaling
+                                    [TPAMI&#39;25] SMC++: Masked Learning of Unsupervised Video Semantic Compression
                                 </h3>
                                 <div class="pub-abstract" itemprop="text">
                                 </div>
                                 <div class="pub-authors" itemprop="author">
-                                        Yuan Tian, <u>Guo Lu</u>, Xiongkuo Min, Zhaohui Che,Guangtao Zhai,Guodong Guo,Zhiyong Gao
+                                       Yuan Tian, Xiaoyue Ling, Cong Geng, Qiang Hu, <u>Guo Lu</u>, and Guangtao Zhai
                                 </div>
                                 <div class="pub-publication">
-                                    <em>International Conference on Computer Vision (ICCV),2021</em>
+                                    <em>IEEE Transactions on Pattern Analysis and Machine Intelligence,2025</em>
                     
                                 </div>                                
                             </div>
@@ -340,22 +370,15 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <h3 class="article-title" itemprop="name">
-                                    [CVPR&#39;21] FVC: A New Framework towards Deep Video Compression in Feature Space
+                                    [CVPR&#39;25] Image Quality Assessment: From Human to Machine Preference<span style="color:red"><strong>(Highlight).</strong></span> 
                                 </h3>
                                 <div class="pub-abstract" itemprop="text">
                                 </div>
                                 <div class="pub-authors" itemprop="author">
-                                        Zhihao Hu, <u>Guo Lu</u>, Dong Xu
+                                        Chunyi Li, Yuan Tian, Xiaoyue Ling, Zicheng Zhang, Haodong Duan, Haoning Wu, Ziheng Jia, Xiaohong Liu, Xiongkuo Min, <u>Guo Lu</u>, Weisi Lin, Guangtao Zhai
                                 </div>
-                                <!-- <div class="pub-publication">
-                                    <em>IEEE CVPR, 2021.</em>
-                                </div> -->
-                                <!-- <div class="pub-links">
-                                    <a class="btn btn-primary btn-outline btn-xs"
-                                        href="https://guolusjtu.github.io/guoluhomepage/paper/PCS2019.pdf">PDF</a>
-                                </div> -->
                                 <div class="pub-publication">
-                                    <em>IEEE Conference on Computer Vision and Pattern Recognition (CVPR),2021. <span style="color:red"><strong>(Oral).</strong></span></em>
+                                    <em>IEEE Conference on Computer Vision and Pattern Recognition (CVPR),2025. <span style="color:red"><strong>(Oral).</strong></span></em>
                     
                                 </div>                                
                             </div>
@@ -366,64 +389,37 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <h3 class="article-title" itemprop="name">
-                                    [CVPR&#39;21] VoxelContext-Net: An Octree based Framework for Point Cloud Compression
+                                    [KDD&#39;25] Towards Trustworthy Multimodal Moderation via Policy-Aligned Reasoning and Hierarchical Labeling
                                 </h3>
                                 <div class="pub-abstract" itemprop="text">
                                 </div>
                                 <div class="pub-authors" itemprop="author">
-                                        Zizheng Que, <u>Guo Lu</u>, Dong Xu
+                                        Anqi Li, Wenwei Jin, Jintao Tong, Pengda Qin, Weijia Li, <u>Guo Lu</u>
                                 </div>
                                 <div class="pub-publication">
-                                    <em>IEEE Conference on Computer Vision and Pattern Recognition (CVPR),2021.</em>
+                                    <em>KDD, 2025.</em>
                                 </div>                                 
-                                <!-- <div class="pub-publication">
-                                    <em>IEEE CVPR, 2019.</em>
-                                </div> -->
-                                <!-- <div class="pub-links">
-                                    <a class="btn btn-primary btn-outline btn-xs"
-                                        href="https://guolusjtu.github.io/guoluhomepage/paper/PCS2019.pdf">PDF</a>
-                                </div> -->
                             </div>
                         </div>
                     </div>
 
-                    <!-- TPAMI20-HW -->
+           
                     <div class="pub-list-item" itemscope itemtype="http://schema.org/CreativeWork">
                         <div class="row">
-
                             <div class="col-md-12">
-
                                 <h3 class="article-title" itemprop="name">
-                                    [TPAMI&#39;20] Learning 3D Human Shape and Pose from Dense Body Parts
+                                    [T-IP&#39;25] Implicit-explicit Integrated Representations for Multi-view Video Compression
                                 </h3>
 
                                 <div class="pub-abstract" itemprop="text">
-
-
-
                                 </div>
 
                                 <div class="pub-authors" itemprop="author">
-
-                                    Hongwen Zhang, Jie Cao, <u>Guo Lu</u>, Wanli Ouyang, and Zhenan Sun
-
+                                    Chen Zhu, <u>Guo Lu</u>, Bing He, Rong Xie, Li Song
                                 </div>
-
                                 <div class="pub-publication">
-
-                                    <em>IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), 2020.</em>
-
+                                    <em>IEEE Transactions on Image Processing,2025.</em>
                                 </div>
-
-<!--                                 <div class="pub-links">
-
-
-                                    <a class="btn btn-primary btn-outline btn-xs"
-                                        href="https://guolusjtu.github.io/guoluhomepage/paper/TPAMI2988453.pdf">PDF</a>
-
-
-                                </div> -->
-
                             </div>
                         </div>
                     </div>
@@ -436,23 +432,16 @@
                             <div class="col-md-12">
 
                                 <h3 class="article-title" itemprop="name">
-                                    [ECCV&#39;20] Content Adaptive and Error Propagation Aware Deep Video Compression
+                                    [JSAC&#39;25] VARFVV: View-Adaptive Real-Time Interactive Free-View Video Streaming with Edge Computing
                                 </h3>
-
                                 <div class="pub-abstract" itemprop="text">
-
-
-
                                 </div>
-
                                 <div class="pub-authors" itemprop="author">
-
-                                    <u>Guo Lu*</u>, Chunlei Cai*, Xiaoyun Zhang, Li Chen, Wanli Ouyang, Dong Xu, Zhiyong Gao
-
+                                    Qiang Hu, Qihan He, Houqiang Zhong, <u>Guo Lu</u>, Xiaoyun Zhang, Guangtao Zhai, Yanfeng Wang
                                 </div>
 
                                 <div class="pub-publication">
-                                    <em>Proceedings of the European Conference on Computer Vision (ECCV), 2020. <span style="color:red"><strong>(Oral, 2% acceptance rate).</em>
+                                    <em>IEEE Journal on Selected Areas in Communications, 2025.</em>
                                 </div>
 
                             </div>
@@ -468,23 +457,15 @@
                             <div class="col-md-12">
 
                                 <h3 class="article-title" itemprop="name">
-                                    [ECCV&#39;20] Improving Deep Video Compression by Resolution-adaptive Flow Coding
+                                    [TPAMI&#39;24] A Coding Framework and Benchmark towards Low-Bitrate Video Understanding
                                 </h3>
-
                                 <div class="pub-abstract" itemprop="text">
-
-
-
                                 </div>
-
                                 <div class="pub-authors" itemprop="author">
-
-                                    Zhihao Hu*, Zhenghao Chen*, Dong Xu, <u>Guo Lu</u>, Wanli Ouyang, Shuhang Gu
-
+                                    Yuan Tian, <u>Guo Lu</u>, Yichao Yan, Guangtao Zhai, Li Chen, Zhiyong Gao
                                 </div>
-
                                 <div class="pub-publication">
-                                    <em>Proceedings of the European Conference on Computer Vision (ECCV), 2020.<span style="color:red"><strong>(Oral, 2% acceptance rate).</strong></span> </em>                       
+                                    <em>IEEE Transactions on Pattern Analysis and Machine Intelligence, 2024. </em>                       
                                 </div>
 
 
@@ -498,26 +479,15 @@
                             <div class="col-md-12">
 
                                 <h3 class="article-title" itemprop="name">
-                                    [TPAMI&#39;20] An End-to-End Learning Framework for Video Compression
+                                    [ICLR&#39;24] Neural Rate Control for Learned Video Compression
                                 </h3>
-
                                 <div class="pub-abstract" itemprop="text">
-
-
-
                                 </div>
-
                                 <div class="pub-authors" itemprop="author">
-
-                                    <u>Guo Lu</u>, Xiaoyun Zhang, Wanli Ouyang, Li Chen, Zhiyong Gao, Dong Xu
-
+                                    Yiwei Zhang, <u>Guo Lu</u>, Yunuo Chen, Shen Wang, Yibo Shi, Jing Wang, Li Song
                                 </div>
-
                                 <div class="pub-publication">
-
-                                    <em>IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), 2020.</em>   <a class="btn btn-primary btn-outline btn-xs"
-                                    href="https://guolusjtu.github.io/guoluhomepage/paper/TPAMI2988453.pdf">PDF</a>
-
+                                    <em>ICLR, 2024.</em>  
                                 </div>
 
                             </div>
@@ -526,33 +496,18 @@
 
                     <div class="pub-list-item" itemscope itemtype="http://schema.org/CreativeWork">
                         <div class="row">
-
                             <div class="col-md-12">
-
                                 <h3 class="article-title" itemprop="name">
-                                    [TIP&#39;19] Deep Non-local Kalman Network for Video Compression Artifact Reduction
+                                    [T-CSVT&#39;24]  Preprocessing enhanced image compression for machine vision
                                 </h3>
-
                                 <div class="pub-abstract" itemprop="text">
-
-
-
                                 </div>
-
                                 <div class="pub-authors" itemprop="author">
-
-                                    <u>Guo Lu</u>, Xiaoyun Zhang, Wanli Ouyang, Dong Xu, Li Chen, Zhiyong Gao.
-
+                                    <u>Guo Lu</u>, Xingtong Ge, Tianxiong Zhong, Jing Geng, Qiang Hu.
                                 </div>
-
                                 <div class="pub-publication">
-
-                                    <em>IEEE Transactions on Image Processing (TIP), 2019.</em>    <a class="btn btn-primary btn-outline btn-xs"
-                                    href="https://guolusjtu.github.io/guoluhomepage/paper/TIP2019_Guo.pdf">PDF</a>
-
-                                </div>
-                                
-
+                                    <em>IEEE Transactions on Circuits and Systems for Video Technology, 2024.</em> 
+                                </div>                                
                             </div>
                         </div>
                     </div>
@@ -561,211 +516,21 @@
 
                     <div class="pub-list-item" itemscope itemtype="http://schema.org/CreativeWork">
                         <div class="row">
-
                             <div class="col-md-12">
-
-
                                 <h3 class="article-title" itemprop="name">
-                                    [CVPR&#39;19] DVC: An End-to-end Deep Video Compression Framework
+                                    [ACMMM&#39;24] Rate-aware Compression for NeRF-based Volumetric Video<span style="color:red"><strong>(Oral).</strong></span> 
                                 </h3>
-
                                 <div class="pub-abstract" itemprop="text">
-
-
-
                                 </div>
-
                                 <div class="pub-authors" itemprop="author">
-
-                                    <u>Guo Lu</u>, Wanli Ouyang, Dong Xu, Xiaoyun Zhang, Chunlei Cai, Zhiyong Gao
-
+                                    Zhiyu Zhang, <u>Guo Lu</u>, Huanxiong Liang, Zhengxue Cheng, Anni Tang, Li Song
                                 </div>
-
                                 <div class="pub-publication">
-
-                                    <em>IEEE Conference on Computer Vision and Pattern Recognition (CVPR),2019.</em> <span style="color:red"><strong>(Oral, 5% acceptance rate).</strong></span> <a class="btn btn-primary btn-outline btn-xs"
-                                        href="https://guolusjtu.github.io/guoluhomepage/paper/CVPR2019_Guo.pdf">PDF</a> <a class="btn btn-primary btn-outline btn-xs" href="https://guolusjtu.github.io/guoluhomepage/paper/3657-supp.pdf">Supp</a>
-                                        <a class="btn btn-primary btn-outline btn-xs" href="https://github.com/GuoLusjtu/DVC">Project</a> 
-                                       <a class="btn btn-primary btn-outline btn-xs" href="https://drive.google.com/file/d/1pst1PcxE02LNzTz708YnrEhnGHbN_MdC/view?usp=sharing">Slides</a>
-                                       <a class="btn btn-primary btn-outline btn-xs" href="https://drive.google.com/file/d/1UpPnid2bdVOO75XljM2Z7nm7h9p0sgrg/view?usp=sharing">Poster</a>
-                                       <a class="btn btn-primary btn-outline btn-xs" href="https://drive.google.com/file/d/1j76QDeVi9ZNDUZd86TloK4JJxqt9IPbT/view?usp=sharing">Video</a> 
-
+                                    <em>ACM MM, 2024.</em> 
                                 </div>
-
-                                <!-- <div class="pub-links">
-                                    <a class="btn btn-primary btn-outline btn-xs"
-                                        href="https://guolusjtu.github.io/guoluhomepage/paper/CVPR2019_Guo.pdf">PDF</a>
-
-                                    <a class="btn btn-primary btn-outline btn-xs" href="https://guolusjtu.github.io/guoluhomepage/paper/3657-supp.pdf">Supp</a>
-                                     <a class="btn btn-primary btn-outline btn-xs" href="https://github.com/GuoLusjtu/DVC">Project</a> 
-                                    <a class="btn btn-primary btn-outline btn-xs" href="https://drive.google.com/file/d/1pst1PcxE02LNzTz708YnrEhnGHbN_MdC/view?usp=sharing">Slides</a>
-                                    <a class="btn btn-primary btn-outline btn-xs" href="https://drive.google.com/file/d/1UpPnid2bdVOO75XljM2Z7nm7h9p0sgrg/view?usp=sharing">Poster</a>
-                                    <a class="btn btn-primary btn-outline btn-xs" href="https://drive.google.com/file/d/1j76QDeVi9ZNDUZd86TloK4JJxqt9IPbT/view?usp=sharing">Video</a>
-                                </div> -->
-
                             </div>
                         </div>
                     </div>
-
-
-                    <div class="pub-list-item" itemscope itemtype="http://schema.org/CreativeWork">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h3 class="article-title" itemprop="name">
-                                    [PCS&#39;19] A Novel Deep Progressive Image Compression Framework
-                                </h3>
-                                <div class="pub-abstract" itemprop="text">
-                                </div>
-                                <div class="pub-authors" itemprop="author">
-                                        Chunlei Cai, Li Chen, Xiaoyun Zhang, <u>Guo Lu</u>, Zhiyong Gao
-                                </div>
-                                <div class="pub-publication">
-                                    <em>IEEE Picture Coding Symposium (PCS), 2019.</em> <a class="btn btn-primary btn-outline btn-xs"
-                                    href="https://guolusjtu.github.io/guoluhomepage/paper/PCS2019.pdf">PDF</a>
-                                </div>
-                                <!-- <div class="pub-links">
-                                    <a class="btn btn-primary btn-outline btn-xs"
-                                        href="https://guolusjtu.github.io/guoluhomepage/paper/PCS2019.pdf">PDF</a>
-                                </div> -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pub-list-item" itemscope itemtype="http://schema.org/CreativeWork">
-                        <div class="row">
-
-                            <div class="col-md-12">
-
-
-                                <h3 class="article-title" itemprop="name">
-                                    [MM&#39;19] DaNet: Decompose-and-aggregate Network for 3D Human Shape and Pose Estimation
-                                </h3>
-
-                                <div class="pub-abstract" itemprop="text">
-
-
-
-                                </div>
-
-                                <div class="pub-authors" itemprop="author">
-
-                                        Hongwen Zhang, Jie Cao, <u>Guo Lu</u> , Wanli Ouyang and Zhenan Sun
-
-                                </div>
-
-                                <div class="pub-publication">
-
-                                    <em>ACM Multimedia (ACM MM), 2019</em> 
-                                    <a class="btn btn-primary btn-outline btn-xs"
-                                        href="https://guolusjtu.github.io/guoluhomepage/paper/ACMMM2019.pdf">PDF</a>
-
-                                </div>
-
-
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="pub-list-item" itemscope itemtype="http://schema.org/CreativeWork">
-                        <div class="row">
-
-                            <div class="col-md-12">
-
-
-                                <h3 class="article-title" itemprop="name">
-                                    [ECCV&#39;18] Deep Kalman Filtering Network for Video Compression Artifact Reduction
-                                </h3>
-
-                                <div class="pub-abstract" itemprop="text">
-
-                                </div>
-
-                                <div class="pub-authors" itemprop="author">
-
-                                        <u>Guo Lu</u>, Wanli Ouyang, Dong Xu, Xiaoyun Zhang, Zhiyong Gao, Ming-Ting Sun
-
-                                </div>
-
-                                <div class="pub-publication">
-
-                                    <em>Proceedings of the European Conference on Computer Vision (ECCV), 2018.</em>
-
-                                    <a class="btn btn-primary btn-outline btn-xs"
-                                    href="https://guolusjtu.github.io/guoluhomepage/paper/ECCV2018.pdf">PDF</a>
-
-                                <a class="btn btn-primary btn-outline btn-xs"
-                                    href="https://drive.google.com/file/d/1mdX4M4yxy3N20zOUiWypq4EqR01KZVZd/view?usp=sharing">Video</a>        
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pub-list-item" itemscope itemtype="http://schema.org/CreativeWork">
-                        <div class="row">
-
-                            <div class="col-md-12">
-
-
-                                <h3 class="article-title" itemprop="name">
-                                    [TIP&#39;18] Novel Integration of Frame Rate Up Conversion and HEVC Coding based on Rate-Distortion Optimization
-                                </h3>
-
-                                <div class="pub-abstract" itemprop="text">
-
-                                </div>
-
-                                <div class="pub-authors" itemprop="author">
-
-                                        <u>Guo Lu</u>, Xiaoyun Zhang, Li Chen, Zhiyong Gao.
-
-                                </div>
-
-                                <div class="pub-publication">
-
-                                    <em>IEEE Transactions on Image Processing (TIP), 2018.</em>
-                                    <a class="btn btn-primary btn-outline btn-xs"
-                                        href="https://guolusjtu.github.io/guoluhomepage/paper/TIP2018.pdf">PDF</a>
-                                </div>
-
-
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- <div class="pub-list-item" itemscope itemtype="http://schema.org/CreativeWork">
-                        <div class="row">
-
-                            <div class="col-md-12">
-
-
-                                <h3 class="article-title" itemprop="name">
-                                    [ICIP&#39;16] A Novel Framework of Frame Rate Up Conversion Integrated Within HEVC Coding
-                                </h3>
-
-                                <div class="pub-abstract" itemprop="text">
-
-                                </div>
-
-                                <div class="pub-authors" itemprop="author">
-
-                                        <u>Guo Lu</u>, Xiaoyun Zhang, Zhiyong Gao
-
-                                </div>
-
-                                <div class="pub-publication">
-
-                                    <em>IEEE International Conference on Image Processing (ICIP), 2016</em> <a class="btn btn-primary btn-outline btn-xs"
-                                    href="https://guolusjtu.github.io/guoluhomepage/paper/ICIP2016.pdf">PDF</a>
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div> -->
 
                 </div>
             </div>
@@ -785,20 +550,18 @@
                     <div class="col-xs-12 col-md-8">
    
                          <ul>
-                             <li>Excellent Doctoral Dissertation Award of Shanghai Jiao Tong University, 2020</li>
+                              <li>Stanford/Elsevier - World’s Top 2% Scientists, 2025.</li>
+                              <li>IEEE WCSP Best Paper Award, 2025</li>                             
+                              <li>VCIP Best Student Paper Runner-up, 2024</li>
+                            <li>China Association for Science and Technology Youth Talent Support Program, 2024</li>
+                            <li>IEEE CASS Visual Signal Processing and Communications (VSPC) Rising Star, 2023.</li>
+                            <li>Excellent Doctoral Dissertation Award of China Society of Image and Graphics, 2022</li>
+                            <li>Top Creativity Award in IEEE VCIP Grand Challenge “Practical End-to-end Image Compression”, 2022.</li>
+                            <li>Excellent Doctoral Dissertation Award of Shanghai Jiao Tong University, 2020</li>
+
                          </ul>
 
-                        <ul>
-                            <li>Scholarship of China Scholarship Council, 2017</li>
-                        </ul>
 
-                        <ul>
-                            <li>Graduation with honor(top 2%),Shandong Province, 2014</li>
-                        </ul>
-
-                        <ul>
-                            <li>National Scholarship, 2012</li>
-                        </ul>
                     </div>
                 </div>
             </div>
@@ -814,21 +577,14 @@
 
                 </div>
                 <div class="col-xs-12 col-md-8">
-
-
-                    <h3 id="undergraduate-courses">Undergraduate Courses</h3>
-
+                    <h3 id="undergraduate-courses">Undergraduate Course</h3>
                     <ul>
-                        <li>Image Compression, Spring 2018,  TA at University of Sydney</li>
-                        <li>Foundations of Digital Logic, Spring 2022, Beijing Institute of Technology</li>
-                        <li>Computer Simulation and MATLAB, Fall, 2021, Beijing Institute of Technology</li>
+                        <li>Video Coding and Communication, 2022 ~ now</li>
                     </ul>
-
-                    <!-- <h3 id="gradudate-courses">Gradudate Courses</h3>
-
+                    <h3 id="gradudate-courses">Gradudate Course</h3>
                     <ul>
-                        <li>Deep RL and Multi-Agent RL, Spring 2020</li>
-                    </ul> -->
+                        <li>Multimedia Networking, 2022～ now</li>
+                    </ul>
 
                 </div>
             </div>
@@ -846,58 +602,47 @@
 
                 </div>
                 <div class="col-xs-12 col-md-8">
-
-
-                    <!-- <h3 id="technical-program-committee-member">Reviewer</h3> -->
-
                     <ul>
                         <li>
-                            <p>Reviewer for T-PAMI, T-IP, T-CSVT, TMM, CVPR, ICCV, ECCV, etc. </p>
-                        </li>
-                    </ul>
-
-                    <ul>
+                            <p>Associate Editor, IEEE T-CSVT, 2025 </p>
+                        </li>                        
                         <li>
-                            <p>Guest Editor, IJCV special issue on Video Understanding and Video Compression. 2021. </p>
+                            <p>IEEE VSPC-TC Member, 2025 </p>
                         </li>
-                    </ul>
-
-                    <ul>
                         <li>
-                            <p>Guest Editor, T-CSVT special issue on Learned Visual Data Compression for both Human and Machine. 2022. </p>
+                            <p>LAC-Technical Program Chairs, ICASSP Satellite Event Suzhou, China. 2025 </p>
                         </li>
-                    </ul>
-
-                    <ul>
                         <li>
-                            <p>Tutorial Organizer, ACM MM Tutorial on Deep Learning for Visual Data Compression, 2021. </p>
+                            <p>Area Chair, International Conference on Learning Representations(ICLR), 2025.</p>
                         </li>
-                    </ul>
-
-                    <ul>
                         <li>
-                            <p>Tutorial Organizer, CVPR Tutorial on Learning for Visual Data Compression, 2021. </p>
-                        </li>
-                    </ul>
-
-                    <ul>
+                            <p>Area Chair, Annual Conference on Neural Information Processing Systems(NeurIPS), 2025.</p>
+                        </li> 
                         <li>
-                            <p>Tutorial Organizer, VCIP Tutorial on Learned Image and Video Compression with Deep Neural Networks, 2020. </p>
-                        </li>
-                    </ul>
-
-                    <ul>
-                        <li>
-                            <p>Tutorial Organizer, IEEE AVSS Tutorial on Deep Learning for Video Compression and Understanding, Taipei, 2019 </p>
-                        </li>
-                    </ul>
-
-                    <ul>
+                            <p>Challenge Organizer, Ultra-low Bitrate Video Compression at VCIP, 2025.</p>
+                        </li>                                                 
                         <li>
                             <p>Senior PC, AAAI 2021. </p>
-                        </li>
+                        </li>                        
+                        <li>
+                            <p>Guest Editor, IJCV special issue on Video Understanding and Video Compression. 2021. </p>
+                        </li>     
+                        <li>
+                            <p>Guest Editor, T-CSVT special issue on Learned Visual Data Compression for both Human and Machine. 2022. </p>
+                        </li>                                                 
+                        <li>
+                            <p>Tutorial Organizer, ACM MM Tutorial on Deep Learning for Visual Data Compression, 2021. </p>
+                        </li>   
+                        <li>
+                            <p>Tutorial Organizer, CVPR Tutorial on Learning for Visual Data Compression, 2021. </p>
+                        </li>    
+                        <li>
+                            <p>Tutorial Organizer, VCIP Tutorial on Learned Image and Video Compression with Deep Neural Networks, 2020. </p>
+                        </li>        
+                        <li>
+                            <p>Tutorial Organizer, IEEE AVSS Tutorial on Deep Learning for Video Compression and Understanding, Taipei, 2019 </p>
+                        </li>                                                                                 
                     </ul>
-
                 </div>
             </div>
         </div>
@@ -918,15 +663,8 @@
                 </div>
                 <div class="col-xs-12 col-md-8">
                     <ul class="list-unstyled">
-
-
-
-
-
-
                         <li>
                             <i class="fa fa-map-marker fa-fw" aria-hidden="true"></i>
-                            <!-- <span>Room 305, Software Building, Beijing Institute of Technology, Beijing, 100081, China.</span> -->
                             <span>Room 403, Building 5, SEIEE, Shanghai Jiao Tong University, China.</span>                            
                         </li>
 
