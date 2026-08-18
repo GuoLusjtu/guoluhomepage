@@ -26,7 +26,11 @@ class HomepageContentTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.homepage = read_text(HOMEPAGE)
-        cls.html_files = tuple(ROOT.rglob("*.html"))
+        cls.html_files = tuple(
+            path
+            for path in ROOT.rglob("*.html")
+            if ".worktrees" not in path.relative_to(ROOT).parts
+        )
 
     def test_homepage_has_current_metadata_description(self):
         expected = (
@@ -107,6 +111,11 @@ class HomepageContentTests(unittest.TestCase):
             for path in self.html_files
         )
         self.assertEqual(18, legacy_footer_count)
+
+    def test_html_file_discovery_excludes_nested_worktrees(self):
+        for path in self.html_files:
+            with self.subTest(path=path):
+                self.assertNotIn(".worktrees", path.relative_to(ROOT).parts)
 
     def test_all_news_navigation_items_are_commented_and_none_are_active(self):
         news_item = (
