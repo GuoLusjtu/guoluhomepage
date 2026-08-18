@@ -74,7 +74,7 @@ class HomepageContentTests(unittest.TestCase):
 
     def test_contact_uses_obfuscated_plain_text_and_no_mailto(self):
         envelope_link = re.compile(
-            r'<a\s+href="#contact">\s*'
+            r'<a\s+href="#contact"\s+aria-label="Contact">\s*'
             r'<i\s+class="fa fa-envelope big-icon"[^>]*></i>\s*</a>',
             re.DOTALL,
         )
