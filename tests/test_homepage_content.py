@@ -8,9 +8,11 @@ ROOT = Path(__file__).resolve().parents[1]
 HOMEPAGE = ROOT / "index.html"
 NEWS_ARCHIVE = ROOT / "news" / "index.html"
 CLOUDFLARE_TOKEN = "7f0b11c30fc344bfb55c572509aea6d0"
+CLOUDFLARE_SCRIPT_URL = "https://static.cloudflareinsights.com/beacon.min.js"
+CLOUDFLARE_DATA_ATTRIBUTE = "data-cf-beacon="
 CLOUDFLARE_BEACON = (
     "<!-- Cloudflare Web Analytics --><script type='module' "
-    "src='https://static.cloudflareinsights.com/beacon.min.js' "
+    f"src='{CLOUDFLARE_SCRIPT_URL}' "
     f"data-cf-beacon='{{\"token\": \"{CLOUDFLARE_TOKEN}\"}}'></script>"
     "<!-- End Cloudflare Web Analytics -->"
 )
@@ -21,7 +23,8 @@ LEGACY_ANALYTICS_MARKERS = (
 )
 LEGACY_GA_CALL = re.compile(r"\bga\s*\(")
 PUBLIC_COUNTER_MARKER = re.compile(
-    r"busuanzi|hitwebcounter|visitor[-_ ]?counter|page[-_ ]?counter|"
+    r"busuanzi|hitwebcounter|visitor[-_ ]?(?:count|counter)|"
+    r"pageview[-_ ]?counter|page[-_ ]?counter|"
     r"site[-_ ]?(?:pv|uv)|访问量|访客数|浏览量",
     re.IGNORECASE,
 )
@@ -157,6 +160,8 @@ class HomepageContentTests(unittest.TestCase):
                 page = read_text(path)
                 self.assertEqual(1, page.count(CLOUDFLARE_BEACON))
                 self.assertEqual(1, page.count(CLOUDFLARE_TOKEN))
+                self.assertEqual(1, page.count(CLOUDFLARE_SCRIPT_URL))
+                self.assertEqual(1, page.count(CLOUDFLARE_DATA_ATTRIBUTE))
                 body_end = page.rindex("</body>")
                 self.assertTrue(
                     page[:body_end].rstrip().endswith(CLOUDFLARE_BEACON)
