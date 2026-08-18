@@ -9,6 +9,7 @@ from urllib.parse import urljoin, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 HOMEPAGE = ROOT / "index.html"
+STYLESHEET = ROOT / "css" / "hugo-academic.css"
 NEWS_ARCHIVE = ROOT / "news" / "index.html"
 NEWS_FEED = ROOT / "news" / "index.xml"
 NEWS_ITEMS = (
@@ -51,6 +52,15 @@ CLOUDFLARE_BEACON = (
 )
 SITE_BASE_URL = "https://guolusjtu.github.io/guoluhomepage/"
 PUBLICATIONS_URL = SITE_BASE_URL + "#publications"
+OWNER_SCHOLAR_URL = (
+    "https://scholar.google.com/citations?user=R9iwlJcAAAAJ&hl=en"
+)
+RECRUITMENT_COPY = (
+    "We are looking for self-motivated Ph.D./M.S. students, research interns, "
+    "and postdoctoral fellows. Prospective applicants are welcome to send a CV "
+    "and transcript by email."
+)
+CHINESE_HOMEPAGE_URL = "https://icisee.sjtu.edu.cn/jiaoshiml/luguo.html"
 RETAINED_HTML_PATHS = (
     "404.html",
     "index.html",
@@ -149,6 +159,40 @@ def raw_section(document, section_id):
     return document[start:end]
 
 
+def css_rule_blocks(stylesheet, selector):
+    selector_pattern = r"\s+".join(
+        re.escape(component) for component in selector.split()
+    )
+    return re.findall(
+        rf"(?:^|\}})\s*{selector_pattern}\s*\{{([^{{}}]*)\}}",
+        stylesheet,
+        flags=re.MULTILINE,
+    )
+
+
+def css_declarations(block):
+    declarations = re.findall(
+        r"(?:^|;)\s*([a-z-]+)\s*:\s*([^;]+?)\s*(?=;|$)",
+        block,
+        flags=re.IGNORECASE,
+    )
+    return {name.lower(): value.strip().lower() for name, value in declarations}
+
+
+def balanced_css_block_after(stylesheet, marker):
+    marker_position = stylesheet.index(marker)
+    opening_brace = stylesheet.index("{", marker_position + len(marker))
+    depth = 0
+    for position in range(opening_brace, len(stylesheet)):
+        if stylesheet[position] == "{":
+            depth += 1
+        elif stylesheet[position] == "}":
+            depth -= 1
+            if depth == 0:
+                return stylesheet[opening_brace + 1 : position]
+    raise AssertionError(f"Unclosed CSS block after {marker!r}")
+
+
 def normalized_rendered_text(html_fragment):
     without_tags = re.sub(r"<[^>]+>", " ", html.unescape(html_fragment))
     return " ".join(without_tags.split())
@@ -172,6 +216,96 @@ class HomepageContentTests(unittest.TestCase):
         )
         self.assertIn(expected, self.homepage)
         self.assertNotIn('content="PhD-SJTU"', self.homepage)
+
+    def test_bio_has_exact_accessible_join_us_callout(self):
+        bio = section(self.homepage, "bio")
+        callouts = re.findall(
+            r'<aside\s+class="join-us-callout"\s+'
+            r'aria-labelledby="join-us-heading">(.*?)</aside>',
+            bio,
+            flags=re.DOTALL,
+        )
+        self.assertEqual(1, len(callouts))
+
+        callout = callouts[0]
+        headings = re.findall(
+            r'<h3\s+id="join-us-heading">(.*?)</h3>',
+            callout,
+            flags=re.DOTALL,
+        )
+        paragraphs = re.findall(r"<p>(.*?)</p>", callout, flags=re.DOTALL)
+        links = re.findall(
+            r'<a\s+href="([^"]+)">(.*?)</a>', callout, flags=re.DOTALL
+        )
+        self.assertEqual(["Join Us"], [normalized_rendered_text(x) for x in headings])
+        self.assertEqual(
+            [RECRUITMENT_COPY],
+            [normalized_rendered_text(x) for x in paragraphs],
+        )
+        self.assertEqual(1, len(links))
+        self.assertEqual(CHINESE_HOMEPAGE_URL, html.unescape(links[0][0]))
+        self.assertEqual("中文主页 →", normalized_rendered_text(links[0][1]))
+
+        self.assertNotRegex(bio, r'<span\b[^>]*style="[^"]*color\s*:\s*red')
+        self.assertNotIn("CV/resume", bio)
+
+    def test_homepage_source_and_stylesheet_are_strict_utf8(self):
+        for path in (HOMEPAGE, STYLESHEET):
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                decoded = path.read_bytes().decode("utf-8", errors="strict")
+                self.assertNotIn("\ufffd", decoded)
+
+        self.assertEqual(1, self.homepage.count("2020&ndash;2022"))
+        rendered_bio = normalized_rendered_text(section(self.homepage, "bio"))
+        self.assertIn(
+            "Beijing Institute of Technology (2020–2022).", rendered_bio
+        )
+
+    def test_owner_google_scholar_links_use_exact_corrected_url(self):
+        owner_scholar_links = tuple(
+            html.unescape(href)
+            for href in re.findall(r'<a\b[^>]*\bhref="([^"]+)"', self.homepage)
+            if "scholar.google.com/citations?user=R9iwlJcAAAAJ" in html.unescape(href)
+        )
+        self.assertEqual((OWNER_SCHOLAR_URL, OWNER_SCHOLAR_URL), owner_scholar_links)
+        self.assertNotIn("hl=en/", self.homepage)
+
+    def test_join_us_callout_has_exact_responsive_accessible_css(self):
+        stylesheet = read_text(STYLESHEET)
+        callout_blocks = css_rule_blocks(stylesheet, ".join-us-callout")
+        self.assertEqual(1, len(callout_blocks))
+        callout_declarations = css_declarations(callout_blocks[0])
+        self.assertEqual("#f4f8fb", callout_declarations.get("background"))
+        self.assertEqual(
+            "4px solid #2f6f9f", callout_declarations.get("border-left")
+        )
+        self.assertEqual("15px 17px", callout_declarations.get("padding"))
+        self.assertEqual("3px", callout_declarations.get("border-radius"))
+        self.assertNotIn("width", callout_declarations)
+        self.assertNotIn("height", callout_declarations)
+
+        media = balanced_css_block_after(stylesheet, "@media (max-width: 767px)")
+        mobile_blocks = css_rule_blocks(media, ".join-us-callout")
+        self.assertEqual(1, len(mobile_blocks))
+        self.assertEqual(
+            "12px 14px", css_declarations(mobile_blocks[0]).get("padding")
+        )
+
+        link_blocks = css_rule_blocks(
+            stylesheet, ".join-us-callout a,\n.join-us-callout a:visited"
+        )
+        self.assertEqual(1, len(link_blocks))
+        self.assertEqual("#2f6f9f", css_declarations(link_blocks[0]).get("color"))
+
+        interaction_blocks = css_rule_blocks(
+            stylesheet, ".join-us-callout a:hover,\n.join-us-callout a:focus"
+        )
+        self.assertEqual(1, len(interaction_blocks))
+        interaction_declarations = css_declarations(interaction_blocks[0])
+        self.assertEqual("#254f70", interaction_declarations.get("color"))
+        self.assertEqual(
+            "underline", interaction_declarations.get("text-decoration")
+        )
 
     def test_retained_archive_shells_have_current_metadata_description(self):
         expected = "Associate Professor at Shanghai Jiao Tong University"
