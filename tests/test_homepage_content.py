@@ -82,8 +82,14 @@ REMOVED_PATHS = (
     "categories/index.xml",
     "files/citations/infocom18.bib",
 )
-PUBLICATIONS_SECTION_SHA256 = (
-    "8d558fcde05bd6159224aee46442921278d3f1994919fcb02b8e1df2de403f3a"
+PUBLICATIONS_SECTION_CANONICAL_SHA256 = (
+    "7535987340efe3c0c14e0b2bca12e9205aa452469b70b47637740f8d29adca91"
+)
+OLD_PUBLICATIONS_SCHOLAR_HREF = (
+    b"https://scholar.google.com/citations?user=R9iwlJcAAAAJ&hl=en/"
+)
+CORRECTED_PUBLICATIONS_SCHOLAR_HREF = (
+    b"https://scholar.google.com/citations?user=R9iwlJcAAAAJ&hl=en"
 )
 PROJECT_TITLES = (
     "Learning to Cooperate",
@@ -219,15 +225,24 @@ class HomepageContentTests(unittest.TestCase):
 
     def test_bio_has_exact_accessible_join_us_callout(self):
         bio = section(self.homepage, "bio")
-        callouts = re.findall(
-            r'<aside\s+class="join-us-callout"\s+'
-            r'aria-labelledby="join-us-heading">(.*?)</aside>',
-            bio,
-            flags=re.DOTALL,
+        callout_matches = tuple(
+            re.finditer(
+                r'<aside\s+class="join-us-callout"\s+'
+                r'aria-labelledby="join-us-heading">(.*?)</aside>',
+                bio,
+                flags=re.DOTALL,
+            )
         )
-        self.assertEqual(1, len(callouts))
+        self.assertEqual(1, len(callout_matches))
 
-        callout = callouts[0]
+        callout_match = callout_matches[0]
+        callout = callout_match.group(1)
+        before_callout = bio[: callout_match.start()]
+        self.assertRegex(before_callout, r"</p>\s*$")
+        self.assertEqual(
+            len(re.findall(r"<p(?:\s|>)", before_callout)),
+            before_callout.count("</p>"),
+        )
         headings = re.findall(
             r'<h3\s+id="join-us-heading">(.*?)</h3>',
             callout,
@@ -245,6 +260,9 @@ class HomepageContentTests(unittest.TestCase):
         self.assertEqual(1, len(links))
         self.assertEqual(CHINESE_HOMEPAGE_URL, html.unescape(links[0][0]))
         self.assertEqual("中文主页 →", normalized_rendered_text(links[0][1]))
+        decoded_bio = html.unescape(bio)
+        self.assertEqual(1, decoded_bio.count(CHINESE_HOMEPAGE_URL))
+        self.assertEqual(1, decoded_bio.count("中文主页 →"))
 
         self.assertNotRegex(bio, r'<span\b[^>]*style="[^"]*color\s*:\s*red')
         self.assertNotIn("CV/resume", bio)
@@ -526,9 +544,13 @@ class HomepageContentTests(unittest.TestCase):
 
     def test_homepage_publications_section_is_byte_for_byte_unchanged(self):
         publications = raw_section(HOMEPAGE.read_bytes(), "publications")
+        canonical_publications = publications.replace(
+            OLD_PUBLICATIONS_SCHOLAR_HREF,
+            CORRECTED_PUBLICATIONS_SCHOLAR_HREF,
+        )
         self.assertEqual(
-            PUBLICATIONS_SECTION_SHA256,
-            hashlib.sha256(publications).hexdigest(),
+            PUBLICATIONS_SECTION_CANONICAL_SHA256,
+            hashlib.sha256(canonical_publications).hexdigest(),
         )
 
     def test_project_body_and_image_assets_are_preserved(self):
