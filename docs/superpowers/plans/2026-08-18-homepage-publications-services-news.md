@@ -422,27 +422,27 @@ if (Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyCon
 $server = $null
 try {
     $server = Start-Process -FilePath $pythonExe -ArgumentList @('-B', '-m', 'http.server', "$port", '--bind', '127.0.0.1') -WorkingDirectory (Get-Location).Path -WindowStyle Hidden -PassThru
-    $home = $null
+    $homeResponse = $null
     for ($attempt = 0; $attempt -lt 20; $attempt++) {
         try {
-            $home = Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:8000/' -TimeoutSec 2
+            $homeResponse = Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:8000/' -TimeoutSec 2
             break
         } catch {
             Start-Sleep -Milliseconds 250
         }
     }
-    if ($null -eq $home -or $home.StatusCode -ne 200) { throw 'Local server did not become ready' }
-    $news = Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:8000/news/' -TimeoutSec 5
-    $tag = Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:8000/tags/video/' -TimeoutSec 5
-    foreach ($response in @($home, $news, $tag)) {
+    if ($null -eq $homeResponse -or $homeResponse.StatusCode -ne 200) { throw 'Local server did not become ready' }
+    $newsResponse = Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:8000/news/' -TimeoutSec 5
+    $tagResponse = Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:8000/tags/video/' -TimeoutSec 5
+    foreach ($response in @($homeResponse, $newsResponse, $tagResponse)) {
         if ($response.StatusCode -ne 200) { throw "Unexpected HTTP $($response.StatusCode)" }
         if ($response.Content -notmatch '<li class="nav-item"><a href="https://guolusjtu\.github\.io/guoluhomepage/#news">News</a></li>') { throw 'Active News navigation missing' }
         if (([regex]::Matches($response.Content, [regex]::Escape('7f0b11c30fc344bfb55c572509aea6d0'))).Count -ne 1) { throw 'Cloudflare token count mismatch' }
         if ($response.Content -match 'UA-88925956-1') { throw 'Legacy GA marker found' }
     }
-    if ($home.Content -notmatch '<section id="news" class="home-section">' -or $home.Content -notmatch 'Two papers were accepted by ACM TOMM and IEEE T-CSVT') { throw 'Homepage News content missing' }
-    if ($news.Content -notmatch 'id="2026-08-service"' -or $news.Content -match 'One paper accepted at ICLR&#39;20|/news/page/2/') { throw 'News archive content mismatch' }
-    if ($tag.Content -notmatch '<title>Video') { throw 'Representative tag marker missing' }
+    if ($homeResponse.Content -notmatch '<section id="news" class="home-section">' -or $homeResponse.Content -notmatch 'Two papers were accepted by ACM TOMM and IEEE T-CSVT') { throw 'Homepage News content missing' }
+    if ($newsResponse.Content -notmatch 'id="2026-08-service"' -or $newsResponse.Content -match 'One paper accepted at ICLR&#39;20|/news/page/2/') { throw 'News archive content mismatch' }
+    if ($tagResponse.Content -notmatch '<title>Video') { throw 'Representative tag marker missing' }
 } finally {
     if ($null -ne $server -and -not $server.HasExited) {
         Stop-Process -Id $server.Id
@@ -456,6 +456,7 @@ try {
 } catch {
     if ($_.Exception.Message -eq 'Request unexpectedly succeeded after shutdown') { throw }
 }
+Write-Output 'Smoke test passed'
 ```
 
 The script requests:
