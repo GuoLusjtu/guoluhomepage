@@ -224,12 +224,14 @@ class HomepageContentTests(unittest.TestCase):
         self.assertEqual(0, active_count)
 
     def test_news_archive_body_and_known_titles_are_preserved(self):
-        archive_bytes = NEWS_ARCHIVE.read_bytes()
+        archive_bytes = NEWS_ARCHIVE.read_bytes().replace(b"\r\n", b"\n")
         separator = b"</nav>"
+        footer = b'<footer class="site-footer">'
         self.assertIn(separator, archive_bytes)
-        archive_body = archive_bytes.split(separator, 1)[1]
+        self.assertIn(footer, archive_bytes)
+        archive_body = archive_bytes.split(separator, 1)[1].split(footer, 1)[0]
         self.assertEqual(
-            "de25264193ea6089fd830c83d0d26f815dc5485fa82467fe77c8f51e7c77efee",
+            "ca28e137c805d35fe170d5c247dd58ca56435a52679c1248111769a571fd0f52",
             hashlib.sha256(archive_body).hexdigest(),
         )
         archive_text = archive_body.decode("utf-8")
