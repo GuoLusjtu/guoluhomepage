@@ -7,7 +7,7 @@ Refresh the homepage with two newly accepted papers and current professional ser
 ## Scope and constraints
 
 - Edit the generated static HTML directly; do not redesign the site or introduce a new build system.
-- Keep the existing About text, publication entries not named below, service entries not named below, legacy News archive entries/detail pages, and all other visible content unchanged.
+- Keep the existing About text, publication entries not named below, service entries not named below, legacy News archive entries and their historical detail URLs, and all other visible content unchanged.
 - Preserve the exact Cloudflare Web Analytics beacon once on every one of the 19 body-bearing HTML pages, keep legacy Google Analytics absent, and leave the 12 meta-refresh redirect stubs byte-for-byte unchanged.
 - The `Recent Publications` section remains a curated list. It may omit papers on which Guo Lu is not the corresponding author, even when a News item reports the full acceptance count.
 
