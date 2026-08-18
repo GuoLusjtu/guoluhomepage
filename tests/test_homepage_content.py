@@ -460,6 +460,7 @@ class HomepageContentTests(unittest.TestCase):
                 else:
                     block_end = archive.index('<footer class="site-footer">', marker_position)
                 block = html.unescape(archive[block_start:block_end])
+                self.assertNotRegex(block, r"<a\b")
                 self.assertEqual(1, block.count(expected_text))
                 self.assertEqual(1, decoded_archive.count(expected_text))
                 rendered = re.sub(r"<[^>]+>", " ", block)
@@ -476,21 +477,24 @@ class HomepageContentTests(unittest.TestCase):
         channel = root.find("channel")
         self.assertIsNotNone(channel)
         atom_link_tag = "{http://www.w3.org/2005/Atom}link"
-        metadata = {
-            child.tag: child.text
-            for child in channel
-            if child.tag not in {"item", atom_link_tag}
-        }
+        channel_children = list(channel)
+        expected_metadata = (
+            ("title", "News | Guo Lu's Homepage"),
+            ("link", "https://guolusjtu.github.io/guoluhomepage/news/"),
+            ("description", "News from Guo Lu's Homepage"),
+            ("language", "en-us"),
+            ("copyright", "© 2020–2026 Guo Lu"),
+            ("lastBuildDate", "Tue, 18 Aug 2026 00:00:00 +0800"),
+            (atom_link_tag, None),
+        )
         self.assertEqual(
-            {
-                "title": "News | Guo Lu's Homepage",
-                "link": "https://guolusjtu.github.io/guoluhomepage/news/",
-                "description": "News from Guo Lu's Homepage",
-                "language": "en-us",
-                "copyright": "© 2020–2026 Guo Lu",
-                "lastBuildDate": "Tue, 18 Aug 2026 00:00:00 +0800",
-            },
-            metadata,
+            tuple(tag for tag, _ in expected_metadata)
+            + ("item",) * len(NEWS_FEED_ITEMS),
+            tuple(child.tag for child in channel_children),
+        )
+        self.assertEqual(
+            expected_metadata,
+            tuple((child.tag, child.text) for child in channel_children[:7]),
         )
         atom_links = channel.findall(atom_link_tag)
         self.assertEqual(1, len(atom_links))
@@ -509,14 +513,20 @@ class HomepageContentTests(unittest.TestCase):
                 expected_url = (
                     "https://guolusjtu.github.io/guoluhomepage/news/#" + fragment
                 )
-                self.assertEqual(title, item.findtext("title"))
-                self.assertEqual(description, item.findtext("description"))
-                self.assertEqual(expected_url, item.findtext("link"))
-                guid = item.find("guid")
-                self.assertIsNotNone(guid)
+                item_children = list(item)
+                self.assertEqual(
+                    (
+                        ("title", title),
+                        ("link", expected_url),
+                        ("guid", expected_url),
+                        ("description", description),
+                    ),
+                    tuple((child.tag, child.text) for child in item_children),
+                )
+                guid = item_children[2]
                 self.assertEqual(expected_url, guid.text)
                 self.assertEqual("true", guid.get("isPermaLink"))
-                self.assertIsNone(item.find("pubDate"))
+                self.assertEqual({"isPermaLink": "true"}, guid.attrib)
         decoded_feed = html.unescape(feed_text)
         self.assertNotIn("Zongqing", decoded_feed)
         for marker in LEGACY_NEWS_MARKERS:
