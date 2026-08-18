@@ -18,7 +18,7 @@ The Cloudflare token is a public site identifier intended to appear in page sour
 
 ## Legacy analytics removal
 
-All 19 content pages currently contain the obsolete Google Analytics Universal Analytics integration for property `UA-88925956-1`, including the `analytics.js` loader and an outbound-link event handler that calls `ga(...)`. Remove each complete legacy Google Analytics block. After this change, visitor analytics must be sent only to Cloudflare, with no remaining references to `www.google-analytics.com/analytics.js`, `UA-88925956-1`, `GoogleAnalyticsObject`, or `ga(...)` in tracked HTML.
+All 19 content pages currently contain the obsolete Google Analytics Universal Analytics integration for property `UA-88925956-1`, including the `analytics.js` loader and an outbound-link event handler that calls `ga(...)`. Remove each complete legacy Google Analytics block. After this change, visitor analytics must be sent only to Cloudflare, with no remaining references to `www.google-analytics.com/analytics.js`, `UA-88925956-1`, `GoogleAnalyticsObject`, or `ga(...)` in audited repository-filesystem HTML outside `.worktrees`.
 
 ## User experience and privacy
 
@@ -40,7 +40,7 @@ Extend the existing standard-library regression suite so it fails before impleme
 - exactly 31 repository-filesystem HTML pages are audited, excluding project-local `.worktrees`, and partition into 19 content pages with `</body>` plus 12 redirect stubs without it;
 - every content page contains exactly one complete beacon snippet using the expected Cloudflare script URL and token, placed before `</body>`;
 - all 12 redirect stubs remain byte-for-byte unchanged and contain no Cloudflare beacon;
-- the legacy Google Analytics loader, property ID, object initializer, and `ga(...)` calls are absent from all tracked HTML;
+- the legacy Google Analytics loader, property ID, object initializer, and `ga(...)` calls are absent from all audited repository-filesystem HTML outside `.worktrees`;
 - no public visitor-counter markup is added;
 - all existing homepage cleanup and preservation tests continue to pass.
 

@@ -37,7 +37,7 @@ Expected: `master` is clean, `.worktrees/` is ignored by the committed `.gitigno
 Run:
 
 ```powershell
-git worktree add ".worktrees/cloudflare-web-analytics" -b "codex/cloudflare-web-analytics"
+git worktree add ".worktrees/cloudflare-web-analytics" -b "codex/cloudflare-web-analytics" $BASE_SHA
 ```
 
 Expected: the worktree is created from `BASE_SHA` at `C:\Users\user\Documents\ChatGPT\个人主页\.worktrees\cloudflare-web-analytics`.
@@ -57,7 +57,7 @@ Expected: clean `codex/cloudflare-web-analytics` branch and the existing 13/13 t
 
 **Files:**
 - Modify: `tests/test_homepage_content.py`
-- Test: all 31 tracked HTML files, excluding `.worktrees`
+- Test: all 31 repository-filesystem HTML files outside `.worktrees`
 
 - [ ] **Step 1: Add constants and helpers**
 
@@ -262,7 +262,7 @@ Run this complete PowerShell script from the isolated worktree:
 $pythonExe = 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
 $beacon = '<!-- Cloudflare Web Analytics --><script type=''module'' src=''https://static.cloudflareinsights.com/beacon.min.js'' data-cf-beacon=''{"token": "7f0b11c30fc344bfb55c572509aea6d0"}''></script><!-- End Cloudflare Web Analytics -->'
 $targets = @(
-    @{ Url = 'http://127.0.0.1:8000/'; Marker = "GUO LU's Homepage" },
+    @{ Url = 'http://127.0.0.1:8000/'; Marker = '<title>GUO LU&#39;s Homepage</title>' },
     @{ Url = 'http://127.0.0.1:8000/news/'; Marker = '<h1>News</h1>' },
     @{ Url = 'http://127.0.0.1:8000/tags/community/'; Marker = 'Community' }
 )
@@ -284,7 +284,7 @@ try {
         $response = Invoke-WebRequest -UseBasicParsing $target.Url -TimeoutSec 5
         if ([int]$response.StatusCode -ne 200) { throw "Unexpected status for $($target.Url)" }
         if (-not $response.Content.Contains($target.Marker)) { throw "Missing marker for $($target.Url)" }
-        if (($response.Content.Split($beacon).Count - 1) -ne 1) { throw "Beacon count mismatch for $($target.Url)" }
+        if (([regex]::Matches($response.Content, [regex]::Escape($beacon))).Count -ne 1) { throw "Beacon count mismatch for $($target.Url)" }
         foreach ($forbidden in @('UA-88925956-1','GoogleAnalyticsObject','www.google-analytics.com/analytics.js')) {
             if ($response.Content.Contains($forbidden)) { throw "Legacy GA remains in $($target.Url)" }
         }
@@ -316,10 +316,12 @@ Run:
 $BASE_SHA = git merge-base HEAD master
 & 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -B tests\test_homepage_content.py -v
 git diff --check $BASE_SHA..HEAD
+git diff --check
+git diff --stat
 git status --short --branch
 ```
 
-Expected before the migration commit: 18/18 tests pass and the working diff is clean except for the 19 planned content-page edits. Use the recorded `BASE_SHA` for all whole-range comparisons; do not use `HEAD~2`.
+Expected before the migration commit: 18/18 tests pass; both diff checks report no whitespace errors; and status/diff stat show only the 19 planned content-page edits. Use the recorded `BASE_SHA` for all whole-range comparisons; do not use `HEAD~2`.
 
 - [ ] **Step 3: Commit the migration**
 
