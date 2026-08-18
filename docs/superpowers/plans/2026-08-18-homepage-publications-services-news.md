@@ -400,7 +400,7 @@ Expected: all tests pass, including exact content/order, 19 active navigation it
 Run:
 
 ```powershell
-$homepageBaseSha = '<recorded-40-character-BASE_SHA>'
+$homepageBaseSha = 'e39e0ee017e32a845ee6cbf56647d856895acc66'
 git diff --check "$homepageBaseSha..HEAD"
 git status --short
 git diff --stat "$homepageBaseSha..HEAD"
@@ -488,7 +488,7 @@ Run the full unittest suite and range `git diff --check` once more. Immediately 
 $pythonExe = 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
 & $pythonExe -B -m unittest discover -s tests -v
 if ($LASTEXITCODE -ne 0) { throw 'Final tests failed' }
-$homepageBaseSha = '<recorded-40-character-BASE_SHA>'
+$homepageBaseSha = 'e39e0ee017e32a845ee6cbf56647d856895acc66'
 git diff --check "$homepageBaseSha..HEAD"
 if ($LASTEXITCODE -ne 0) { throw 'Final diff check failed' }
 git fetch origin
