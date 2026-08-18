@@ -1,151 +1,48 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>News on Zongqing&#39;s Homepage</title>
+    <title>News | Guo Lu's Homepage</title>
     <link>https://guolusjtu.github.io/guoluhomepage/news/</link>
-    <description>Recent content in News on Zongqing&#39;s Homepage</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>News from Guo Lu's Homepage</description>
     <language>en-us</language>
-    <copyright>&amp;copy; 2018 Zongqing Lu</copyright>
-    <lastBuildDate>Fri, 20 Dec 2019 10:00:00 +0800</lastBuildDate>
-    
-	<atom:link href="https://guolusjtu.github.io/guoluhomepage/news/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <copyright>© 2020–2026 Guo Lu</copyright>
+    <lastBuildDate>Tue, 18 Aug 2026 00:00:00 +0800</lastBuildDate>
+    <atom:link href="https://guolusjtu.github.io/guoluhomepage/news/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>One paper accepted at ICLR&#39;20</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/iclr20/</link>
-      <pubDate>Fri, 20 Dec 2019 10:00:00 +0800</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/iclr20/</guid>
-      <description>Our paper &amp;ldquo;Graph Convolutional Reinforcement Learning&amp;rdquo; was accepted at ICLR&amp;rsquo;20. Congratulations to Jiechuan Jiang.</description>
+      <title>ICLR 2027 and AAAI 2027 service roles</title>
+      <link>https://guolusjtu.github.io/guoluhomepage/news/#2026-08-service</link>
+      <guid isPermaLink="true">https://guolusjtu.github.io/guoluhomepage/news/#2026-08-service</guid>
+      <description>August 2026 — Invited to serve as an Area Chair for ICLR 2027 and as a Senior PC member for AAAI 2027.</description>
     </item>
-    
     <item>
-      <title>One paper accepted at TON</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/ton19-netvision/</link>
-      <pubDate>Mon, 18 Nov 2019 18:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/ton19-netvision/</guid>
-      <description>Our paper &amp;ldquo;NetVision: On-demand Video Processing in Wireless Networks&amp;rdquo; was accepted at IEEE/ACM Transactions on Networking.</description>
+      <title>Two journal papers accepted</title>
+      <link>https://guolusjtu.github.io/guoluhomepage/news/#2026-08-publications</link>
+      <guid isPermaLink="true">https://guolusjtu.github.io/guoluhomepage/news/#2026-08-publications</guid>
+      <description>August 2026 — Two papers were accepted by ACM TOMM and IEEE T-CSVT.</description>
     </item>
-    
     <item>
-      <title>One paper accepted at AAAI&#39;20</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/aaai20/</link>
-      <pubDate>Tue, 12 Nov 2019 01:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/aaai20/</guid>
-      <description>Our paper &amp;ldquo;Generative Exploration and Exploitation&amp;rdquo; was accepted at AAAI&amp;rsquo;20. Congratulations to Jiechuan Jiang.</description>
+      <title>ACM MM 2026 and ECCV 2026 papers accepted</title>
+      <link>https://guolusjtu.github.io/guoluhomepage/news/#2026-07-publications</link>
+      <guid isPermaLink="true">https://guolusjtu.github.io/guoluhomepage/news/#2026-07-publications</guid>
+      <description>July 2026 — Two papers were accepted by ACM MM 2026, and one paper was accepted by ECCV 2026.</description>
     </item>
-    
     <item>
-      <title>One paper accepted at TMC</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/tmc19-augur/</link>
-      <pubDate>Wed, 09 Oct 2019 18:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/tmc19-augur/</guid>
-      <description>Our paper &amp;ldquo;Augur: Modeling the Resource Requirements of ConvNets on Mobile Devices&amp;rdquo; was accepted at IEEE Transactions on Mobile Computing.</description>
+      <title>ECCV 2026 compression challenge</title>
+      <link>https://guolusjtu.github.io/guoluhomepage/news/#2026-06-challenge</link>
+      <guid isPermaLink="true">https://guolusjtu.github.io/guoluhomepage/news/#2026-06-challenge</guid>
+      <description>June 2026 — Organizing the Challenge on Ultra-Low Bitrate Image Compression at ECCV 2026.</description>
     </item>
-    
     <item>
-      <title>One paper accepted at NIPS&#39;19</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/nips19/</link>
-      <pubDate>Thu, 05 Sep 2019 09:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/nips19/</guid>
-      <description>Our paper &amp;ldquo;Learning Fairness in Multi-Agent Systems&amp;rdquo; was accepted at NIPS&amp;rsquo;19. Congratulations to Jiechuan Jiang.</description>
+      <title>IEEE JETCAS Special Issue Guest Editor</title>
+      <link>https://guolusjtu.github.io/guoluhomepage/news/#2026-03-jetcas</link>
+      <guid isPermaLink="true">https://guolusjtu.github.io/guoluhomepage/news/#2026-03-jetcas</guid>
+      <description>March 2026 — Serving as a Guest Editor for an IEEE JETCAS Special Issue.</description>
     </item>
-    
     <item>
-      <title>GENE accepted at ERL&#39;19 as a Spotlight Talk</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/erl19/</link>
-      <pubDate>Mon, 27 May 2019 09:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/erl19/</guid>
-      <description>Our paper &amp;ldquo;Generative Exploration and Exploitation&amp;rdquo; was accepted at ICML&amp;rsquo;19 Workshop on Exploration in Reinforcement Learning (ERL&amp;rsquo;19) as a Spotlight Talk.</description>
+      <title>Two CVPR 2026 papers accepted</title>
+      <link>https://guolusjtu.github.io/guoluhomepage/news/#2026-02-cvpr</link>
+      <guid isPermaLink="true">https://guolusjtu.github.io/guoluhomepage/news/#2026-02-cvpr</guid>
+      <description>February 2026 — Two papers were accepted by CVPR 2026.</description>
     </item>
-    
-    <item>
-      <title>One paper accepted at NIPS&#39;18</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/nips18/</link>
-      <pubDate>Wed, 05 Sep 2018 09:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/nips18/</guid>
-      <description>Our paper &amp;ldquo;Learning Attentional Communication for Multiagent Cooperation&amp;rdquo; was accepted at NIPS&amp;rsquo;18. Congratulations to Jiechuan Jiang.</description>
-    </item>
-    
-    <item>
-      <title>One paper accepted at TMC</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/tmc18-crowdvision/</link>
-      <pubDate>Fri, 27 Jul 2018 18:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/tmc18-crowdvision/</guid>
-      <description>Our paper &amp;ldquo;CrowdVision: A Computing Platform for Video Crowdprocessing Using Deep Learning&amp;rdquo; was accepted at IEEE Transactions on Mobile Computing.</description>
-    </item>
-    
-    <item>
-      <title>One paper accepted at INFOCOM&#39;18</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/infocom18/</link>
-      <pubDate>Tue, 28 Nov 2017 18:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/infocom18/</guid>
-      <description>Our paper &amp;ldquo;A Computing Platform for Video Crowdprocessing Using Deep Learning&amp;rdquo; was accepted at the IEEE International Conference on Computer Communications (INFOCOM) 2018.</description>
-    </item>
-    
-    <item>
-      <title>One paper accepted at TON</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/ton17/</link>
-      <pubDate>Thu, 03 Aug 2017 18:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/ton17/</guid>
-      <description>Our paper &amp;ldquo;Cooperative Data Offload in Opportunistic Networks: From Mobile Devices to Infrastructure&amp;rdquo; was accepted at IEEE/ACM Transactions on Networking.</description>
-    </item>
-    
-    <item>
-      <title>One paper accepted at MM&#39;17</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/mm17/</link>
-      <pubDate>Wed, 12 Jul 2017 18:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/mm17/</guid>
-      <description>Our paper &amp;ldquo;Modeling the Resource Requirements of Convolutional Neural Networks on Mobile Devices&amp;rdquo; was accepted at the ACM International Conference on Multimedia (MM) 2017.</description>
-    </item>
-    
-    <item>
-      <title>One paper accepted at TMC</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/tmc17/</link>
-      <pubDate>Sun, 09 Apr 2017 18:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/tmc17/</guid>
-      <description>Our paper &amp;ldquo;TeamPhone: Networking Smartphones for Disaster Recovery&amp;rdquo; was accepted at IEEE Transactions on Mobile Computing.</description>
-    </item>
-    
-    <item>
-      <title>One paper accepted at ICNP&#39;16</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/icnp16/</link>
-      <pubDate>Wed, 17 Aug 2016 18:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/icnp16/</guid>
-      <description>Our paper &amp;ldquo;On-demand Video Processing in Wireless Networks&amp;rdquo; was accepted at the IEEE International Conference on Network Protocols (ICNP), 2016.</description>
-    </item>
-    
-    <item>
-      <title>Summer Research at Army Research Laboratory</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/arl16/</link>
-      <pubDate>Thu, 04 Aug 2016 18:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/arl16/</guid>
-      <description>I spent this summer at Army Research Laboratory to build an emulation environment for deep learning based video processing in large-scale wireless networks.</description>
-    </item>
-    
-    <item>
-      <title>Best-in-Session Presentation Award at INFOCOM&#39;16</title>
-      <link>https://guolusjtu.github.io/guoluhomepage/news/infocom16-talk/</link>
-      <pubDate>Sat, 30 Apr 2016 18:26:27 -0400</pubDate>
-      
-      <guid>https://guolusjtu.github.io/guoluhomepage/news/infocom16-talk/</guid>
-      <description>My talk &amp;ldquo;Cooperative Data Offloading in Opportunistic Mobile Networks&amp;rdquo; won the Best-in-Session Presentation Award in the technical session of Data Offloading at INFOCOM&amp;rsquo;16.</description>
-    </item>
-    
   </channel>
 </rss>
