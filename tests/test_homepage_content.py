@@ -4,7 +4,7 @@ import hashlib
 import re
 import unittest
 import xml.etree.ElementTree as ET
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -75,6 +75,38 @@ REMOVED_PATHS = (
 PUBLICATIONS_SECTION_SHA256 = (
     "8d558fcde05bd6159224aee46442921278d3f1994919fcb02b8e1df2de403f3a"
 )
+PROJECT_TITLES = (
+    "Learning to Cooperate",
+    "Distributed Video Processing Using Deep Learning on Networked Devices",
+    "Building Smartphone Networks",
+    "Health Sensing Using Mobile Devices",
+    "Exploring Social Structure for Network Designs",
+)
+PROJECT_TAG_LABELS = (
+    "Reinforcement Learning",
+    "Multiagent Learning",
+    "Deep Learning",
+    "Edge Computing",
+    "Smartphones",
+    "Opportunistic Networking",
+    "Data Offload",
+    "Infectious Diseases",
+    "Human Contact Networks",
+    "Respiratory Symptoms",
+    "Smartphones",
+    "Social Networks",
+    "Community",
+    "Information Diffusion",
+)
+PROJECT_ASSET_SHA256 = {
+    "atoc.png": "9d961c904cb14966c7298e709b48d4461eb4a6483e68ccaa612a55876c888c20",
+    "crowdvision.png": "784a2c7267a3e5e083329368aa71927d490fbdfcc804b0a814d16147deda0aaa",
+    "dgn.png": "44ffd593c90078d71e7dc9817ec0a12d6da628ea2db61487b780fd7ab6b74f90",
+    "healthcare.jpg": "b0916fb9bb9aa257a8bb67e71ff8dc611d6dea26fbe311f17388bb34ead706f0",
+    "learning-preview.png": "3a46ee5e3066e9967f07dc12e187935c2228b6e4f1f70e88b66ca547843dfd82",
+    "netvision.png": "99e901387311b50b3daf1bd421416507fe3a4fa9d3a94c1c78239bdb47580f29",
+    "teamphone.png": "968333aa69e3eb1ca404f1e484c0908ccd63d423ed6a45022e01b753bf2a3414",
+}
 LEGACY_ANALYTICS_MARKERS = (
     "UA-88925956-1",
     "GoogleAnalyticsObject",
@@ -352,6 +384,49 @@ class HomepageContentTests(unittest.TestCase):
             hashlib.sha256(publications).hexdigest(),
         )
 
+    def test_project_body_and_image_assets_are_preserved(self):
+        project = read_text(ROOT / "project" / "index.html")
+        summaries = re.findall(
+            r'<p\b[^>]*class="project-summary"[^>]*>(.*?)</p>',
+            project,
+            flags=re.DOTALL,
+        )
+        self.assertEqual(5, len(summaries))
+        rendered_project = normalized_rendered_text(project)
+        for title in PROJECT_TITLES:
+            with self.subTest(title=title):
+                self.assertEqual(1, rendered_project.count(title))
+        rendered_tags = tuple(
+            normalized_rendered_text(fragment)
+            for fragment in re.findall(
+                r'<span class="article-tags">(.*?)</span>',
+                project,
+                flags=re.DOTALL,
+            )
+        )
+        actual_tag_labels = tuple(
+            label.strip()
+            for tag_group in rendered_tags
+            for label in tag_group.split(",")
+        )
+        self.assertEqual(PROJECT_TAG_LABELS, actual_tag_labels)
+        for image_reference in (
+            "/img/sponsors/nsfc.jpg",
+            "/img/sponsors/huawei.png",
+            "/img/sponsors/hikvision.jpeg",
+            "/img/sponsors/tencent.png",
+        ):
+            with self.subTest(image_reference=image_reference):
+                self.assertEqual(1, project.count(f'src="{image_reference}"'))
+
+        asset_directory = ROOT / "img" / "project"
+        actual_assets = {
+            path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in asset_directory.iterdir()
+            if path.is_file()
+        }
+        self.assertEqual(PROJECT_ASSET_SHA256, actual_assets)
+
     def test_only_retained_html_pages_remain(self):
         actual = tuple(
             sorted(path.relative_to(ROOT).as_posix() for path in self.html_files)
@@ -394,12 +469,37 @@ class HomepageContentTests(unittest.TestCase):
             redirect,
             flags=re.IGNORECASE,
         )
-        fallback = re.findall(
-            rf'<a\s+href="{re.escape(PUBLICATIONS_URL)}"[^>]*>', redirect
+        fallback = tuple(
+            (attributes, body)
+            for attributes, body in re.findall(
+                r"<a\b([^>]*)>(.*?)</a>", redirect, flags=re.DOTALL | re.IGNORECASE
+            )
+            if re.search(
+                rf'href=["\']{re.escape(PUBLICATIONS_URL)}["\']',
+                attributes,
+                flags=re.IGNORECASE,
+            )
         )
         self.assertEqual([PUBLICATIONS_URL], canonical)
         self.assertEqual([PUBLICATIONS_URL], refresh)
         self.assertEqual(1, len(fallback))
+        fallback_attributes, fallback_body = fallback[0]
+        self.assertTrue(normalized_rendered_text(fallback_body))
+        self.assertNotRegex(
+            fallback_attributes,
+            re.compile(r"(?:^|\s)hidden(?:\s|=|$)", re.IGNORECASE),
+        )
+        self.assertNotRegex(
+            fallback_attributes,
+            re.compile(r"aria-hidden\s*=\s*[\"']?true", re.IGNORECASE),
+        )
+        self.assertNotRegex(
+            fallback_attributes,
+            re.compile(
+                r"style\s*=\s*[\"'][^\"']*(?:display\s*:\s*none|visibility\s*:\s*hidden)",
+                re.IGNORECASE,
+            ),
+        )
         self.assertEqual(1, redirect.count(CLOUDFLARE_BEACON))
         self.assertNotRegex(redirect, r"/publication/[^\"#]+/")
 
@@ -464,8 +564,9 @@ class HomepageContentTests(unittest.TestCase):
         failures = []
         for relative_path in RETAINED_HTML_PATHS:
             page = read_text(ROOT / relative_path)
+            page_url = urljoin(SITE_BASE_URL, relative_path)
             for href in re.findall(r'href=["\']([^"\']+)', page, re.I):
-                parsed = urlparse(html.unescape(href))
+                parsed = urlparse(urljoin(page_url, html.unescape(href)))
                 if parsed.netloc and parsed.netloc.lower() != "guolusjtu.github.io":
                     continue
                 path = parsed.path.lstrip("/")
