@@ -11,7 +11,7 @@ Update the generated static homepage without rebuilding the legacy Hugo project.
 3. Replace the incorrect AAAI'25 publication venue with `Proceedings of the AAAI Conference on Artificial Intelligence, 39(10), 10725–10733, 2025.`
 4. Keep `(Highlight)` for the CVPR'25 Image Quality Assessment paper and remove the conflicting `(Oral)` label from that entry only. Preserve valid `(Oral)` labels on other publications.
 5. Remove the invalid `mailto:sdluguo AT gmail.com` link. Make the header email icon link to `#contact`, and display `luguo2014 AT sjtu.edu.cn` as plain text in the Contact section.
-6. Wrap the complete News navigation `<li>` in an HTML comment in every HTML file that currently contains that item (19 files). Preserve the existing `news/` files unchanged and directly accessible for later content updates.
+6. Wrap the complete News navigation `<li>` in an HTML comment in every HTML file that currently contains that item (19 files). Preserve the News archive content and direct accessibility for later updates; in `news/index.html`, only the same navigation comment may change while its archive body remains unchanged.
 7. On the homepage only, rename the Awards section anchor from `#project` to `#awards` and update its Awards navigation link to `#awards`. Preserve unrelated `#projects` links elsewhere.
 8. On the homepage only, change the footer from `© 2020 Guo Lu` to `© 2020–2026 Guo Lu`.
 
@@ -29,7 +29,7 @@ A repository-local check will verify that:
 - the metadata description, AAAI citation, `Graduate Course` text, and `id="graduate-courses"` are correct;
 - the Image Quality Assessment entry contains `(Highlight)` but not `(Oral)`, while other publication labels remain unchanged;
 - the header email icon resolves to `#contact`, Contact visibly contains the plain text `luguo2014 AT sjtu.edu.cn`, and the invalid `mailto:sdluguo AT gmail.com` is absent;
-- all 19 existing News navigation items are commented out as complete `<li>` elements, while `/news/index.html` remains present and unchanged;
+- all 19 existing News navigation items are commented out as complete `<li>` elements, while `/news/index.html` remains directly accessible and its archive body is otherwise unchanged;
 - the homepage Awards navigation resolves to the homepage `id="awards"`, with exact checks that do not match or alter unrelated `#projects` links;
 - the homepage footer shows `© 2020–2026 Guo Lu` without modifying legacy attribution on other pages.
 
