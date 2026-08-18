@@ -2,12 +2,12 @@
 
 ## Goal
 
-Refresh the homepage with two newly accepted papers and current professional service, and restore News using a hybrid presentation: six concise items on the homepage plus a complete chronological archive at `/news/`. Keep the existing visual language, preserve historical News and analytics, and avoid presenting the homepage publication list as exhaustive.
+Refresh the homepage with two newly accepted papers and current professional service, and restore News using a hybrid presentation: six concise items on the homepage plus a chronological archive at `/news/` beginning in 2026. Keep the existing visual language and analytics, and avoid presenting the homepage publication list as exhaustive.
 
 ## Scope and constraints
 
 - Edit the generated static HTML directly; do not redesign the site or introduce a new build system.
-- Keep the existing About text, publication entries not named below, service entries not named below, legacy News archive entries and their historical detail URLs, and all other visible content unchanged.
+- Keep the existing About text, publication entries not named below, service entries not named below, and all other visible content unchanged. The pre-2026 News archive is intentionally retired from both HTML and XML.
 - Preserve the exact Cloudflare Web Analytics beacon once on every one of the 19 body-bearing HTML pages, keep legacy Google Analytics absent, and leave the 12 meta-refresh redirect stubs byte-for-byte unchanged.
 - The `Recent Publications` section remains a curated list. It may omit papers on which Guo Lu is not the corresponding author, even when a News item reports the full acceptance count.
 
@@ -82,16 +82,14 @@ The ACM MM count intentionally reports two accepted papers even though the curat
 
 ### Archive
 
-- Prepend the same six entries to `/news/` in the same order.
-- Preserve the 10 historical items currently rendered in `/news/`, their wording, and their existing legacy detail URLs.
-- Restore the five older historical items that are present in `news/index.xml` but no longer rendered because `/news/page/2/` is missing: MM'17, TMC'17, ICNP'16, Summer Research at Army Research Laboratory, and the INFOCOM'16 Best-in-Session Presentation Award. Use the dates, titles, summaries, and legacy URLs already recorded in the XML feed. The resulting archive contains all 15 legacy items after the six new entries.
-- Remove the dead `/news/page/2/` pager after restoring those five items; the archive is a single complete chronological page.
+- Replace the current `/news/` item list with the same six 2026 entries in the same order.
+- Remove all 15 pre-2026 items: the 10 currently rendered in `/news/` and the five older items found only in `news/index.xml`.
+- Replace the item list in `news/index.xml` with the same six 2026 announcements, so the feed and visible archive share the same time boundary. Do not invent individual detail-page URLs for these items.
+- Remove the dead `/news/page/2/` pager; the archive is a single chronological page beginning in 2026.
 - The six new concise entries do not receive individual detail pages.
 - Future routine News may remain archive-only text; individual detail pages are optional for substantive announcements.
 
-The legacy detail URLs are preserved as historical link values, but their corresponding local detail-page files are already absent from this repository. Rebuilding those missing pages is outside this refresh.
-
-When a seventh newer item is added later, the homepage should still show only the newest six while `/news/` retains the complete history.
+When a seventh newer item is added later, the homepage should still show only the newest six while `/news/` and `news/index.xml` retain the complete history from 2026 onward.
 
 ### Navigation
 
@@ -109,10 +107,11 @@ Tests must verify:
 - the five specified service lines are exact, stale year variants are gone, no duplicate is introduced, and the deadline is absent;
 - the homepage contains one `id="news"` section between About and Publications, exactly the six specified items in exact order, and one `More News` link to `/news/`;
 - all 19 body-bearing pages contain an active News navigation item and no commented News navigation item;
-- `/news/` begins with the same six new items, followed by all 15 legacy items in chronological order; the 10 currently rendered items remain unchanged, the five XML-only items are restored from their recorded metadata, all legacy detail URLs retain their existing values, and the dead `/news/page/2/` pager is absent;
+- `/news/` contains exactly the same six 2026 items in the same order, with no pre-2026 entries or dead `/news/page/2/` pager;
+- `news/index.xml` contains the same six 2026 announcements and no pre-2026 item or invented detail-page URL;
 - no individual detail page is created for any of the six new entries;
 - the Cloudflare beacon remains exact and single-instance on all 19 content pages, legacy Google Analytics remains absent, and the 12 redirect stubs remain byte-for-byte unchanged.
 
-The existing News preservation test currently hashes the archive from the first navigation close through the footer/analytics region. Adjust it deliberately so it protects the 10 currently rendered legacy items as an unchanged subregion, separately verifies the five restored XML-only items against `news/index.xml`, and excludes the newly prepended entries, navigation, removed dead pager, footer, and analytics. This must allow the six new entries and complete single-page archive while still detecting unintended modification or removal of historical News content and URLs.
+The existing News preservation test currently hashes the pre-2026 archive. Replace that assertion deliberately: verify the exact six-item HTML archive and matching six-item XML feed, and explicitly verify that the known pre-2026 titles, legacy detail URLs, and dead pager are absent. Continue to protect the News page shell, footer, and analytics through the existing general page invariants.
 
 Run the full regression suite and a local HTTP smoke test for `/`, `/news/`, and one representative tag page. Confirm the new homepage/archive content, active News navigation, existing page markers, and analytics invariants. Deployment and production verification are a separate final step after the implementation is reviewed and the user authorizes pushing.
