@@ -83,9 +83,13 @@ The ACM MM count intentionally reports two accepted papers even though the curat
 ### Archive
 
 - Prepend the same six entries to `/news/` in the same order.
-- Preserve every existing historical archive item, its wording, and its existing detail-page link.
+- Preserve the 10 historical items currently rendered in `/news/`, their wording, and their existing legacy detail URLs.
+- Restore the five older historical items that are present in `news/index.xml` but no longer rendered because `/news/page/2/` is missing: MM'17, TMC'17, ICNP'16, Summer Research at Army Research Laboratory, and the INFOCOM'16 Best-in-Session Presentation Award. Use the dates, titles, summaries, and legacy URLs already recorded in the XML feed. The resulting archive contains all 15 legacy items after the six new entries.
+- Remove the dead `/news/page/2/` pager after restoring those five items; the archive is a single complete chronological page.
 - The six new concise entries do not receive individual detail pages.
 - Future routine News may remain archive-only text; individual detail pages are optional for substantive announcements.
+
+The legacy detail URLs are preserved as historical link values, but their corresponding local detail-page files are already absent from this repository. Rebuilding those missing pages is outside this refresh.
 
 When a seventh newer item is added later, the homepage should still show only the newest six while `/news/` retains the complete history.
 
@@ -105,11 +109,10 @@ Tests must verify:
 - the five specified service lines are exact, stale year variants are gone, no duplicate is introduced, and the deadline is absent;
 - the homepage contains one `id="news"` section between About and Publications, exactly the six specified items in exact order, and one `More News` link to `/news/`;
 - all 19 body-bearing pages contain an active News navigation item and no commented News navigation item;
-- `/news/` begins with the same six new items while all legacy archive items, known historical titles, and old detail links remain unchanged;
+- `/news/` begins with the same six new items, followed by all 15 legacy items in chronological order; the 10 currently rendered items remain unchanged, the five XML-only items are restored from their recorded metadata, all legacy detail URLs retain their existing values, and the dead `/news/page/2/` pager is absent;
 - no individual detail page is created for any of the six new entries;
 - the Cloudflare beacon remains exact and single-instance on all 19 content pages, legacy Google Analytics remains absent, and the 12 redirect stubs remain byte-for-byte unchanged.
 
-The existing News preservation test currently hashes the archive from the first navigation close through the footer/analytics region. Adjust it deliberately so it protects only the legacy archive subregion. The revised assertion must allow the six new entries to be prepended while still detecting any modification or removal of old News content and links.
+The existing News preservation test currently hashes the archive from the first navigation close through the footer/analytics region. Adjust it deliberately so it protects the 10 currently rendered legacy items as an unchanged subregion, separately verifies the five restored XML-only items against `news/index.xml`, and excludes the newly prepended entries, navigation, removed dead pager, footer, and analytics. This must allow the six new entries and complete single-page archive while still detecting unintended modification or removal of historical News content and URLs.
 
 Run the full regression suite and a local HTTP smoke test for `/`, `/news/`, and one representative tag page. Confirm the new homepage/archive content, active News navigation, existing page markers, and analytics invariants. Deployment and production verification are a separate final step after the implementation is reviewed and the user authorizes pushing.
-
