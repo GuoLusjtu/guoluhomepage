@@ -25,7 +25,7 @@ Remove the copied Zongqing Lu publication archive and its generated discovery su
 
 - Add regression tests before production edits and confirm they fail for the existing copied archive.
 - Assert the homepage publication section remains byte-for-byte unchanged across the cleanup.
-- Assert `/publication/index.html` redirects to `/#publications` and the copied publication feed/tag artifacts are absent.
+- Assert `/publication/index.html` redirects to `/guoluhomepage/#publications` and the copied publication feed/tag artifacts are absent.
 - Assert retained HTML/XML files contain no legacy site-owner identity strings.
 - Assert the 404 page contains no copied publication titles or old publication links.
 - Run the full test suite, HTML/XML audits, `git diff --check`, and a local HTTP smoke test for `/`, `/publication/`, `/news/`, and `/404.html`.
