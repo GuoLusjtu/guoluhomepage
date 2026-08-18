@@ -460,7 +460,7 @@ class HomepageContentTests(unittest.TestCase):
                 else:
                     block_end = archive.index('<footer class="site-footer">', marker_position)
                 block = html.unescape(archive[block_start:block_end])
-                self.assertNotRegex(block, r"<a\b")
+                self.assertNotRegex(block, re.compile(r"<a\b", re.IGNORECASE))
                 self.assertEqual(1, block.count(expected_text))
                 self.assertEqual(1, decoded_archive.count(expected_text))
                 rendered = re.sub(r"<[^>]+>", " ", block)
