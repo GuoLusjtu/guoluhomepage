@@ -173,6 +173,16 @@ class HomepageContentTests(unittest.TestCase):
         self.assertIn(expected, self.homepage)
         self.assertNotIn('content="PhD-SJTU"', self.homepage)
 
+    def test_retained_archive_shells_have_current_metadata_description(self):
+        expected = "Associate Professor at Shanghai Jiao Tong University"
+        for relative_path in ("404.html", "news/index.html", "project/index.html"):
+            page = read_text(ROOT / relative_path)
+            descriptions = re.findall(
+                r'<meta\s+name="description"\s+content="([^"]*)">', page
+            )
+            with self.subTest(path=relative_path):
+                self.assertEqual([expected], descriptions)
+
     def test_graduate_course_heading_has_correct_text_and_id(self):
         self.assertIn(
             '<h3 id="graduate-courses">Graduate Course</h3>', self.homepage
