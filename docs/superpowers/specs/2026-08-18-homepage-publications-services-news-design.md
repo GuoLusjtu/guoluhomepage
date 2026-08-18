@@ -52,9 +52,9 @@ Keep the existing Associate Editor entry first. Add or update the following entr
 
 - `Guest Editor, IEEE Journal on Emerging and Selected Topics in Circuits and Systems (JETCAS) Special Issue on “When Large Models Meet Video Coding: Synergies, Systems, and Hardware Challenges,” 2026.`
 - `Challenge Organizer, The Challenge on Ultra-Low Bitrate Image Compression @ ECCV 2026.`
-- `Area Chair, International Conference on Learning Representations (ICLR), 2025, 2026, 2027.`
+- `Area Chair, International Conference on Learning Representations (ICLR), 2025, 2026.`
 - `Area Chair, Annual Conference on Neural Information Processing Systems (NeurIPS), 2025, 2026.`
-- `Senior PC, AAAI, 2021, 2026, 2027.`
+- `Senior PC, AAAI, 2021, 2026.`
 
 Do not show the JETCAS submission deadline. Do not show a month for the challenge in Professional Services. Preserve all other service entries and their order as closely as the existing structure allows.
 
@@ -62,7 +62,7 @@ Do not show the JETCAS submission deadline. Do not show a month for the challeng
 
 Use these six concise entries, in this exact newest-first order and without paper titles:
 
-1. `August 2026 — Invited to serve as an Area Chair for ICLR 2027 and as a Senior PC member for AAAI 2027.`
+1. `August 2026 — Serving as an Area Chair for ICLR and as a Senior PC member for AAAI.`
 2. `August 2026 — Two papers were accepted by ACM TOMM and IEEE T-CSVT.`
 3. `July 2026 — Two papers were accepted by ACM MM 2026, and one paper was accepted by ECCV 2026.`
 4. `June 2026 — Organizing the Challenge on Ultra-Low Bitrate Image Compression at ECCV 2026.`

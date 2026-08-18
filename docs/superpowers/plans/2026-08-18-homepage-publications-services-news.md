@@ -81,7 +81,7 @@ import xml.etree.ElementTree as ET
 
 NEWS_FEED = ROOT / "news" / "index.xml"
 NEWS_ITEMS = (
-    "August 2026 — Invited to serve as an Area Chair for ICLR 2027 and as a Senior PC member for AAAI 2027.",
+    "August 2026 — Serving as an Area Chair for ICLR and as a Senior PC member for AAAI.",
     "August 2026 — Two papers were accepted by ACM TOMM and IEEE T-CSVT.",
     "July 2026 — Two papers were accepted by ACM MM 2026, and one paper was accepted by ECCV 2026.",
     "June 2026 — Organizing the Challenge on Ultra-Low Bitrate Image Compression at ECCV 2026.",
@@ -98,7 +98,7 @@ LEGACY_NEWS_MARKERS = (
     "/news/page/2/",
 )
 NEWS_FEED_ITEMS = (
-    ("2026-08-service", "ICLR 2027 and AAAI 2027 service roles", NEWS_ITEMS[0]),
+    ("2026-08-service", "ICLR and AAAI service roles", NEWS_ITEMS[0]),
     ("2026-08-publications", "Two journal papers accepted", NEWS_ITEMS[1]),
     ("2026-07-publications", "ACM MM 2026 and ECCV 2026 papers accepted", NEWS_ITEMS[2]),
     ("2026-06-challenge", "ECCV 2026 compression challenge", NEWS_ITEMS[3]),
@@ -237,9 +237,9 @@ Place two existing-style `pub-list-item` blocks immediately after ACMMM'26 and b
 Keep Associate Editor first. Insert JETCAS Guest Editor and ECCV Challenge Organizer directly after it, then preserve the remaining current order while replacing the ICLR, NeurIPS, and AAAI lines with:
 
 ```html
-<p>Area Chair, International Conference on Learning Representations (ICLR), 2025, 2026, 2027.</p>
+<p>Area Chair, International Conference on Learning Representations (ICLR), 2025, 2026.</p>
 <p>Area Chair, Annual Conference on Neural Information Processing Systems (NeurIPS), 2025, 2026.</p>
-<p>Senior PC, AAAI, 2021, 2026, 2027.</p>
+<p>Senior PC, AAAI, 2021, 2026.</p>
 ```
 
 Use the two exact new service sentences from the design spec. Do not include the JETCAS deadline or a month.
