@@ -34,7 +34,8 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = (ROOT / "index.html").read_text(encoding="utf-8")
 HTML_FILES = sorted(ROOT.rglob("*.html"))
-NEWS_ARCHIVE = (ROOT / "news" / "index.html").read_text(encoding="utf-8")
+NEWS_ARCHIVE_BYTES = (ROOT / "news" / "index.html").read_bytes()
+NEWS_ARCHIVE = NEWS_ARCHIVE_BYTES.decode("utf-8")
 
 NEWS_ITEM = re.compile(
     r'<li class="nav-item">\s*<a href="https://guolusjtu\.github\.io/'
@@ -133,8 +134,8 @@ class HomepageContentTests(unittest.TestCase):
         self.assertEqual(19, len(commented))
 
     def test_news_archive_body_remains_available(self):
-        archive_body = NEWS_ARCHIVE.split("</nav>", 1)[1]
-        digest = hashlib.sha256(archive_body.encode("utf-8")).hexdigest()
+        archive_body = NEWS_ARCHIVE_BYTES.split(b"</nav>", 1)[1]
+        digest = hashlib.sha256(archive_body).hexdigest()
         self.assertEqual(
             "de25264193ea6089fd830c83d0d26f815dc5485fa82467fe77c8f51e7c77efee",
             digest,
