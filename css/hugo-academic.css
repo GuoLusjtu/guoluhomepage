@@ -652,6 +652,43 @@ nav#navbar-main li {
 }
 
 /*************************************************
+ *  Join Us callout
+ **************************************************/
+
+.join-us-callout {
+    background: #f4f8fb;
+    border-left: 4px solid #2f6f9f;
+    padding: 15px 17px;
+    border-radius: 3px;
+    margin-top: 20px;
+}
+
+.join-us-callout h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.join-us-callout p {
+    margin-bottom: 8px;
+}
+
+.join-us-callout a,
+.join-us-callout a:visited {
+    color: #2f6f9f;
+}
+
+.join-us-callout a:hover,
+.join-us-callout a:focus {
+    color: #254f70;
+    text-decoration: underline;
+}
+
+@media (max-width: 767px) { .join-us-callout {
+        padding: 12px 14px;
+    }
+}
+
+/*************************************************
  *  Tables
  **************************************************/
 
