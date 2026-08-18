@@ -30,7 +30,7 @@ $BASE_SHA = git rev-parse HEAD
 Write-Output $BASE_SHA
 ```
 
-Expected: `master` is clean, `.worktrees/` is ignored by the committed `.gitignore`, and `BASE_SHA` records the exact documentation-only starting commit. At execution time, `master` is expected to be four commits ahead of `origin/master`; record the actual count rather than relying on a hard-coded SHA.
+Expected: `master` is clean, `.worktrees/` is ignored by the committed `.gitignore`, and `BASE_SHA` records the exact documentation-only starting commit. Record and verify the actual ahead count at execution time rather than relying on a hard-coded value.
 
 - [ ] **Step 2: Create the feature branch and worktree**
 
@@ -361,7 +361,7 @@ Use a fast-forward merge after fresh tests pass on the feature branch.
 
 Run the bundled Python suite with `-B` from the main working tree. The `.worktrees` exclusion regression must keep the count at 18 tests even while the isolated worktree exists.
 
-Expected: 18/18 tests pass. Before push, `master` is expected to be six commits ahead of `origin/master`: the four already-pending documentation commits plus the two reviewed implementation commits. Verify the actual count dynamically.
+Expected: 18/18 tests pass. Before push, dynamically verify that `master` is ahead of `origin/master` by the existing documentation commits plus the two reviewed implementation commits.
 
 - [ ] **Step 3: Push `master` and verify the remote SHA**
 
