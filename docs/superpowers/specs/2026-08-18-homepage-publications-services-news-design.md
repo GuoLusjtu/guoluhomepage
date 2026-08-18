@@ -50,7 +50,7 @@ Do not display acceptance months in publication entries. Do not add the second A
 
 Keep the existing Associate Editor entry first. Add or update the following entries without creating duplicates:
 
-- `Guest Editor, IEEE Journal on Emerging and Selected Topics in Circuits and Systems (JETCAS) Special Issue on “When Large Models Meet Video Coding: Synergies, Systems, and Hardware Challenges,” 2026.`
+- `Guest Editor, IEEE JETCAS Special Issue on “When Large Models Meet Video Coding: Synergies, Systems, and Hardware Challenges,” 2026.`
 - `Challenge Organizer, The Challenge on Ultra-Low Bitrate Image Compression @ ECCV 2026.`
 - `Area Chair, International Conference on Learning Representations (ICLR), 2025, 2026.`
 - `Area Chair, Annual Conference on Neural Information Processing Systems (NeurIPS), 2025, 2026.`
