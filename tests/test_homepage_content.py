@@ -81,6 +81,11 @@ def section(html_text, section_id):
     return html_text[start:end]
 
 
+def normalized_rendered_text(html_fragment):
+    without_tags = re.sub(r"<[^>]+>", " ", html.unescape(html_fragment))
+    return " ".join(without_tags.split())
+
+
 class HomepageContentTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -152,11 +157,13 @@ class HomepageContentTests(unittest.TestCase):
                 "IEEE Transactions on Circuits and Systems for Video Technology, 2026.",
             ),
         )
+        publications = html.unescape(section(self.homepage, "publications"))
         for lookup_title, expected_title, url, authors, venue in expected:
             with self.subTest(title=expected_title):
                 self.assertIn(lookup_title, self.homepage)
                 entry = publication_entry(self.homepage, lookup_title)
                 decoded_entry = html.unescape(entry)
+                self.assertEqual(1, publications.count(expected_title))
                 title_link = re.search(
                     r'<h3\b[^>]*>\s*<a\s+href="([^"]+)">\s*(.*?)\s*</a>\s*</h3>',
                     decoded_entry,
@@ -182,6 +189,7 @@ class HomepageContentTests(unittest.TestCase):
                 self.assertEqual(1, entry.count("<u>Guo Lu</u>"))
                 self.assertEqual(1, entry.count("<u>"))
                 self.assertEqual(1, entry.count("</u>"))
+                self.assertNotRegex(decoded_entry.lower(), r"\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\b")
 
     def test_2026_publications_have_confirmed_order(self):
         publications = html.unescape(section(self.homepage, "publications"))
@@ -212,6 +220,10 @@ class HomepageContentTests(unittest.TestCase):
 
     def test_professional_services_have_confirmed_2026_roles(self):
         services = html.unescape(section(self.homepage, "services"))
+        service_entries = tuple(
+            normalized_rendered_text(item)
+            for item in re.findall(r"<li\b[^>]*>(.*?)</li>", services, flags=re.DOTALL)
+        )
         associate_editor = "Associate Editor, IEEE T-CSVT, 2025"
         confirmed_roles = (
             "Guest Editor, IEEE Journal on Emerging and Selected Topics in Circuits and Systems (JETCAS) Special Issue on “When Large Models Meet Video Coding: Synergies, Systems, and Hardware Challenges,” 2026.",
@@ -220,11 +232,30 @@ class HomepageContentTests(unittest.TestCase):
             "Area Chair, Annual Conference on Neural Information Processing Systems (NeurIPS), 2025, 2026.",
             "Senior PC, AAAI, 2021, 2026, 2027.",
         )
-        self.assertEqual(1, services.count(associate_editor))
+        preserved_roles = (
+            associate_editor,
+            "IEEE VSPC-TC Member, 2025",
+            "LAC-Technical Program Chairs, ICASSP Satellite Event Suzhou, China. 2025",
+            "Challenge Organizer, Ultra-low Bitrate Video Compression at VCIP, 2025.",
+            "Guest Editor, IJCV special issue on Video Understanding and Video Compression. 2021.",
+            "Guest Editor, T-CSVT special issue on Learned Visual Data Compression for both Human and Machine. 2022.",
+            "Tutorial Organizer, ACM MM Tutorial on Deep Learning for Visual Data Compression, 2021.",
+            "Tutorial Organizer, CVPR Tutorial on Learning for Visual Data Compression, 2021.",
+            "Tutorial Organizer, VCIP Tutorial on Learned Image and Video Compression with Deep Neural Networks, 2020.",
+            "Tutorial Organizer, IEEE AVSS Tutorial on Deep Learning for Video Compression and Understanding, Taipei, 2019",
+        )
+        self.assertEqual(len(confirmed_roles) + len(preserved_roles), len(service_entries))
         for role in confirmed_roles:
             with self.subTest(role=role):
-                self.assertEqual(1, services.count(role))
-                self.assertLess(services.index(associate_editor), services.index(role))
+                self.assertEqual(1, service_entries.count(role))
+                self.assertLess(
+                    service_entries.index(associate_editor), service_entries.index(role)
+                )
+        for role in preserved_roles:
+            with self.subTest(preserved_role=role):
+                self.assertEqual(1, service_entries.count(role))
+        preserved_positions = [service_entries.index(role) for role in preserved_roles]
+        self.assertEqual(sorted(preserved_positions), preserved_positions)
         for stale_role in (
             "International Conference on Learning Representations(ICLR), 2025.",
             "Annual Conference on Neural Information Processing Systems(NeurIPS), 2025.",
@@ -234,13 +265,22 @@ class HomepageContentTests(unittest.TestCase):
                 self.assertNotIn(stale_role, services)
         self.assertNotIn("submission deadline", services.lower())
         self.assertNotIn("June 1, 2026", services)
-        for preserved_role in (
-            "IEEE VSPC-TC Member, 2025",
-            "LAC-Technical Program Chairs, ICASSP Satellite Event Suzhou, China. 2025",
-            "Challenge Organizer, Ultra-low Bitrate Video Compression at VCIP, 2025.",
-        ):
-            with self.subTest(preserved_role=preserved_role):
-                self.assertIn(preserved_role, services)
+        jetcas_entries = tuple(
+            entry for entry in service_entries if entry.startswith("Guest Editor, IEEE")
+        )
+        challenge_entries = tuple(
+            entry
+            for entry in service_entries
+            if entry.startswith("Challenge Organizer, The Challenge")
+        )
+        self.assertEqual(1, len(jetcas_entries))
+        self.assertEqual(1, len(challenge_entries))
+        for entry in (jetcas_entries[0], challenge_entries[0]):
+            with self.subTest(no_month_or_deadline=entry):
+                self.assertNotRegex(
+                    entry.lower(),
+                    r"submission deadline|\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\b",
+                )
 
     def test_contact_uses_obfuscated_plain_text_and_no_mailto(self):
         envelope_link = re.compile(
@@ -376,13 +416,11 @@ class HomepageContentTests(unittest.TestCase):
             self.homepage.index('id="news"'), self.homepage.index('id="publications"')
         )
         news = html.unescape(section(self.homepage, "news"))
-        self.assertEqual(6, len(re.findall(r"<li\b", news)))
-        positions = []
-        for item in NEWS_ITEMS:
-            with self.subTest(item=item):
-                self.assertEqual(1, news.count(item))
-                positions.append(news.index(item))
-        self.assertEqual(sorted(positions), positions)
+        news_entries = tuple(
+            normalized_rendered_text(item)
+            for item in re.findall(r"<li\b[^>]*>(.*?)</li>", news, flags=re.DOTALL)
+        )
+        self.assertEqual(NEWS_ITEMS, news_entries)
         more_news_links = re.findall(
             r'<a\b[^>]*href="(?:https://guolusjtu\.github\.io)?/guoluhomepage/news/"[^>]*>\s*More News\s*</a>',
             news,
@@ -394,7 +432,20 @@ class HomepageContentTests(unittest.TestCase):
         archive = read_text(NEWS_ARCHIVE)
         decoded_archive = html.unescape(archive)
         ids = tuple(fragment for fragment, _, _ in NEWS_FEED_ITEMS)
-        self.assertEqual(6, len(re.findall(r'id="2026-[^"]+"', archive)))
+        news_wrapper_ids = tuple(
+            re.findall(r'<(?:article|div)\b[^>]*\bid="(2026-[^"]+)"[^>]*>', archive)
+        )
+        self.assertEqual(ids, news_wrapper_ids)
+        self.assertNotIn('class="article-metadata"', archive)
+        self.assertNotIn('class="article-style"', archive)
+        self.assertNotRegex(
+            archive,
+            r'<h2>\s*<a\s+href="[^"]*/news/(?!#)[^"]+/',
+        )
+        self.assertNotRegex(
+            archive,
+            r'href="https://guolusjtu\.github\.io/guoluhomepage/news/(?!#|")([^"#]+/)+"',
+        )
         positions = []
         for index, (fragment, _, expected_text) in enumerate(NEWS_FEED_ITEMS):
             with self.subTest(fragment=fragment):
