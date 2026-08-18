@@ -4,6 +4,7 @@ import hashlib
 import re
 import unittest
 import xml.etree.ElementTree as ET
+from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,6 +49,32 @@ CLOUDFLARE_BEACON = (
     f"data-cf-beacon='{{\"token\": \"{CLOUDFLARE_TOKEN}\"}}'></script>"
     "<!-- End Cloudflare Web Analytics -->"
 )
+SITE_BASE_URL = "https://guolusjtu.github.io/guoluhomepage/"
+PUBLICATIONS_URL = SITE_BASE_URL + "#publications"
+RETAINED_HTML_PATHS = (
+    "404.html",
+    "index.html",
+    "news/index.html",
+    "project/index.html",
+    "publication/index.html",
+)
+STANDARD_SHELL_PATHS = (
+    "404.html",
+    "index.html",
+    "news/index.html",
+    "project/index.html",
+)
+REMOVED_PATHS = (
+    "publication/index.xml",
+    "index.xml",
+    "home/index.xml",
+    "project/index.xml",
+    "categories/index.xml",
+    "files/citations/infocom18.bib",
+)
+PUBLICATIONS_SECTION_SHA256 = (
+    "8d558fcde05bd6159224aee46442921278d3f1994919fcb02b8e1df2de403f3a"
+)
 LEGACY_ANALYTICS_MARKERS = (
     "UA-88925956-1",
     "GoogleAnalyticsObject",
@@ -79,6 +106,12 @@ def section(html_text, section_id):
     start = html_text.index(f'<section id="{section_id}"')
     end = html_text.index("</section>", start) + len("</section>")
     return html_text[start:end]
+
+
+def raw_section(document, section_id):
+    start = document.index(f'<section id="{section_id}"'.encode("utf-8"))
+    end = document.index(b"</section>", start) + len(b"</section>")
+    return document[start:end]
 
 
 def normalized_rendered_text(html_fragment):
@@ -312,12 +345,18 @@ class HomepageContentTests(unittest.TestCase):
         self.assertIn("&copy; 2020–2026 Guo Lu", self.homepage)
         self.assertNotIn("&copy; 2020 Guo Lu", self.homepage)
 
-    def test_legacy_zongqing_lu_footers_are_preserved(self):
-        legacy_footer_count = sum(
-            read_text(path).count("&copy; 2018 Zongqing Lu")
-            for path in self.html_files
+    def test_homepage_publications_section_is_byte_for_byte_unchanged(self):
+        publications = raw_section(HOMEPAGE.read_bytes(), "publications")
+        self.assertEqual(
+            PUBLICATIONS_SECTION_SHA256,
+            hashlib.sha256(publications).hexdigest(),
         )
-        self.assertEqual(18, legacy_footer_count)
+
+    def test_only_retained_html_pages_remain(self):
+        actual = tuple(
+            sorted(path.relative_to(ROOT).as_posix() for path in self.html_files)
+        )
+        self.assertEqual(RETAINED_HTML_PATHS, actual)
 
     def test_html_file_discovery_excludes_nested_worktrees(self):
         for path in self.html_files:
@@ -325,23 +364,15 @@ class HomepageContentTests(unittest.TestCase):
                 self.assertNotIn(".worktrees", path.relative_to(ROOT).parts)
 
     def test_analytics_audit_classifies_all_repository_html_files(self):
-        content_pages = tuple(
-            path for path in self.html_files if "</body>" in read_text(path)
-        )
-        redirect_pages = tuple(
-            path for path in self.html_files if "</body>" not in read_text(path)
-        )
-        self.assertEqual(31, len(self.html_files))
-        self.assertEqual(19, len(content_pages))
-        self.assertEqual(12, len(redirect_pages))
-        self.assertEqual(set(self.html_files), set(content_pages) | set(redirect_pages))
-        self.assertFalse(set(content_pages) & set(redirect_pages))
+        expected = {ROOT / path for path in RETAINED_HTML_PATHS}
+        self.assertEqual(expected, set(self.html_files))
+        for path in self.html_files:
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                self.assertIn("</body>", read_text(path))
 
     def test_content_pages_have_one_cloudflare_beacon_before_body_end(self):
-        content_pages = (
-            path for path in self.html_files if "</body>" in read_text(path)
-        )
-        for path in content_pages:
+        for relative_path in RETAINED_HTML_PATHS:
+            path = ROOT / relative_path
             with self.subTest(path=path.relative_to(ROOT).as_posix()):
                 page = read_text(path)
                 self.assertEqual(1, page.count(CLOUDFLARE_BEACON))
@@ -353,29 +384,96 @@ class HomepageContentTests(unittest.TestCase):
                     page[:body_end].rstrip().endswith(CLOUDFLARE_BEACON)
                 )
 
-    def test_redirect_stubs_are_unmodified_and_have_no_cloudflare_beacon(self):
-        redirect_pages = sorted(
-            (
-                path
-                for path in self.html_files
-                if "</body>" not in read_text(path)
-            ),
-            key=lambda path: path.relative_to(ROOT).as_posix().encode("utf-8"),
+    def test_publication_index_redirects_to_homepage_publications(self):
+        redirect = read_text(ROOT / "publication" / "index.html")
+        canonical = re.findall(
+            r'<link\s+rel="canonical"\s+href="([^"]+)"\s*/?>', redirect
         )
-        snapshot = b"".join(
-            path.relative_to(ROOT).as_posix().encode("utf-8")
-            + b"\0"
-            + path.read_bytes()
-            + b"\0"
-            for path in redirect_pages
+        refresh = re.findall(
+            r'<meta\s+http-equiv="refresh"\s+content="\s*0\s*;\s*url=([^"]+)"\s*/?>',
+            redirect,
+            flags=re.IGNORECASE,
         )
-        for path in redirect_pages:
+        fallback = re.findall(
+            rf'<a\s+href="{re.escape(PUBLICATIONS_URL)}"[^>]*>', redirect
+        )
+        self.assertEqual([PUBLICATIONS_URL], canonical)
+        self.assertEqual([PUBLICATIONS_URL], refresh)
+        self.assertEqual(1, len(fallback))
+        self.assertEqual(1, redirect.count(CLOUDFLARE_BEACON))
+        self.assertNotRegex(redirect, r"/publication/[^\"#]+/")
+
+    def test_legacy_generated_archives_and_citation_are_absent(self):
+        for relative_path in REMOVED_PATHS:
+            with self.subTest(path=relative_path):
+                self.assertFalse((ROOT / relative_path).exists())
+        self.assertFalse((ROOT / "tags").exists())
+
+    def test_retained_site_owner_identity_contains_no_zongqing(self):
+        retained = tuple(ROOT / path for path in RETAINED_HTML_PATHS) + (
+            NEWS_FEED,
+            ROOT / "sitemap.xml",
+        )
+        for path in retained:
             with self.subTest(path=path.relative_to(ROOT).as_posix()):
-                self.assertNotIn(CLOUDFLARE_BEACON, read_text(path))
-        self.assertEqual(
-            "fb95fbe62cb3204583afd7b2cba254184babdff19b2e8add1208b973a894e162",
-            hashlib.sha256(snapshot).hexdigest(),
+                self.assertNotRegex(read_text(path), re.compile("zongqing", re.I))
+
+    def test_404_has_no_copied_publications_and_links_home(self):
+        not_found = read_text(ROOT / "404.html")
+        self.assertNotRegex(not_found, r'href="[^"]*/publication/[^"#]+/"')
+        for copied_title in (
+            "Learning Fairness in Multi-Agent Systems",
+            "CrowdVision: A Computing Platform",
+            "Cooperative Data Offload in Opportunistic Networks",
+            "Community Detection in Weighted Networks",
+        ):
+            with self.subTest(title=copied_title):
+                self.assertNotIn(copied_title, html.unescape(not_found))
+        self.assertRegex(
+            not_found,
+            rf'<a\s+href="{re.escape(SITE_BASE_URL)}"[^>]*>[^<]+</a>',
         )
+
+    def test_sitemap_contains_only_retained_indexable_routes(self):
+        sitemap_root = ET.fromstring(read_text(ROOT / "sitemap.xml"))
+        namespace = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+        locations = tuple(
+            node.text for node in sitemap_root.findall(f"{namespace}url/{namespace}loc")
+        )
+        self.assertEqual(
+            (
+                SITE_BASE_URL,
+                SITE_BASE_URL + "news/",
+                SITE_BASE_URL + "project/",
+            ),
+            locations,
+        )
+
+    def test_retained_html_links_do_not_target_removed_local_routes(self):
+        removed_route = re.compile(
+            r"^(?:"
+            r"tags(?:/|$)|"
+            r"home(?:/|$)|"
+            r"categories(?:/|$)|"
+            r"publication/(?!$).+|"
+            r"news/(?!$|index\.xml$).+|"
+            r"project/(?!$).+|"
+            r"(?:index|home/index|project/index|categories/index)\.xml$"
+            r")"
+        )
+        failures = []
+        for relative_path in RETAINED_HTML_PATHS:
+            page = read_text(ROOT / relative_path)
+            for href in re.findall(r'href=["\']([^"\']+)', page, re.I):
+                parsed = urlparse(html.unescape(href))
+                if parsed.netloc and parsed.netloc.lower() != "guolusjtu.github.io":
+                    continue
+                path = parsed.path.lstrip("/")
+                if path.startswith("guoluhomepage/"):
+                    path = path[len("guoluhomepage/") :]
+                if removed_route.match(path):
+                    failures.append((relative_path, href))
+        self.assertEqual([], failures)
 
     def test_all_html_files_exclude_legacy_google_analytics(self):
         for path in self.html_files:
@@ -399,16 +497,13 @@ class HomepageContentTests(unittest.TestCase):
         )
         commented_item = re.compile(r"<!--\s*" + news_item + r"\s*-->")
         active_item = re.compile(news_item)
-        for path in self.html_files:
+        for relative_path in STANDARD_SHELL_PATHS:
+            path = ROOT / relative_path
             page = read_text(path)
             page_without_comments = re.sub(r"<!--.*?-->", "", page, flags=re.DOTALL)
             with self.subTest(path=path.relative_to(ROOT).as_posix()):
-                if "</body>" in page:
-                    self.assertEqual(1, len(active_item.findall(page_without_comments)))
-                    self.assertEqual(0, len(commented_item.findall(page)))
-                else:
-                    self.assertEqual(0, len(active_item.findall(page_without_comments)))
-                    self.assertEqual(0, len(commented_item.findall(page)))
+                self.assertEqual(1, len(active_item.findall(page_without_comments)))
+                self.assertEqual(0, len(commented_item.findall(page)))
 
     def test_homepage_news_has_latest_six_and_archive_link(self):
         self.assertEqual(1, self.homepage.count('id="news"'))
@@ -549,11 +644,12 @@ class HomepageContentTests(unittest.TestCase):
         self.assertEqual({"news/index.html", "news/index.xml"}, files)
         self.assertEqual(set(), directories)
 
-    def test_unrelated_projects_anchors_are_preserved(self):
+    def test_retained_standard_shells_preserve_projects_navigation(self):
         projects_count = sum(
-            read_text(path).count("#projects") for path in self.html_files
+            read_text(ROOT / path).count("#projects")
+            for path in STANDARD_SHELL_PATHS
         )
-        self.assertEqual(18, projects_count)
+        self.assertEqual(3, projects_count)
 
 
 if __name__ == "__main__":
