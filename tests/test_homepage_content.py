@@ -1,12 +1,44 @@
 from pathlib import Path
+import html
 import hashlib
 import re
 import unittest
+import xml.etree.ElementTree as ET
 
 
 ROOT = Path(__file__).resolve().parents[1]
 HOMEPAGE = ROOT / "index.html"
 NEWS_ARCHIVE = ROOT / "news" / "index.html"
+NEWS_FEED = ROOT / "news" / "index.xml"
+NEWS_ITEMS = (
+    "August 2026 — Invited to serve as an Area Chair for ICLR 2027 and as a Senior PC member for AAAI 2027.",
+    "August 2026 — Two papers were accepted by ACM TOMM and IEEE T-CSVT.",
+    "July 2026 — Two papers were accepted by ACM MM 2026, and one paper was accepted by ECCV 2026.",
+    "June 2026 — Organizing the Challenge on Ultra-Low Bitrate Image Compression at ECCV 2026.",
+    "March 2026 — Serving as a Guest Editor for an IEEE JETCAS Special Issue.",
+    "February 2026 — Two papers were accepted by CVPR 2026.",
+)
+LEGACY_NEWS_MARKERS = (
+    "One paper accepted at ICLR&#39;20",
+    "One paper accepted at TON",
+    "One paper accepted at AAAI&#39;20",
+    "/news/iclr20/",
+    "/news/mm17/",
+    "/news/infocom16-talk/",
+    "/news/page/2/",
+)
+NEWS_FEED_ITEMS = (
+    ("2026-08-service", "ICLR 2027 and AAAI 2027 service roles", NEWS_ITEMS[0]),
+    ("2026-08-publications", "Two journal papers accepted", NEWS_ITEMS[1]),
+    (
+        "2026-07-publications",
+        "ACM MM 2026 and ECCV 2026 papers accepted",
+        NEWS_ITEMS[2],
+    ),
+    ("2026-06-challenge", "ECCV 2026 compression challenge", NEWS_ITEMS[3]),
+    ("2026-03-jetcas", "IEEE JETCAS Special Issue Guest Editor", NEWS_ITEMS[4]),
+    ("2026-02-cvpr", "Two CVPR 2026 papers accepted", NEWS_ITEMS[5]),
+)
 CLOUDFLARE_TOKEN = "7f0b11c30fc344bfb55c572509aea6d0"
 CLOUDFLARE_SCRIPT_URL = "https://static.cloudflareinsights.com/beacon.min.js"
 CLOUDFLARE_DATA_ATTRIBUTE = "data-cf-beacon="
@@ -41,6 +73,12 @@ def publication_entry(homepage, title):
     if entry_end == -1:
         entry_end = len(homepage)
     return homepage[entry_start:entry_end]
+
+
+def section(html_text, section_id):
+    start = html_text.index(f'<section id="{section_id}"')
+    end = html_text.index("</section>", start) + len("</section>")
+    return html_text[start:end]
 
 
 class HomepageContentTests(unittest.TestCase):
@@ -96,6 +134,113 @@ class HomepageContentTests(unittest.TestCase):
         ):
             with self.subTest(title=title):
                 self.assertIn("(Oral)", publication_entry(self.homepage, title))
+
+    def test_new_2026_journal_publications_have_exact_content(self):
+        expected = (
+            (
+                "Diff-VF: Training-free High-quality Long Video Generation via Diffusion Model",
+                "[TOMM'26] Diff-VF: Training-free High-quality Long Video Generation via Diffusion Model",
+                "https://scholar.google.com.au/citations?view_op=view_citation&hl=zh-CN&user=R9iwlJcAAAAJ&sortby=pubdate&citation_for_view=R9iwlJcAAAAJ:4fKUyHm3Qg0C",
+                "Haoning Yang, Xinyuan Chen, Yaohui Wang, <u>Guo Lu</u>",
+                "ACM Transactions on Multimedia Computing, Communications, and Applications (TOMM), 2026.",
+            ),
+            (
+                "Large Language Model for Lossless Image Compression with Visual Prompts",
+                "[T-CSVT'26] Large Language Model for Lossless Image Compression with Visual Prompts",
+                "https://scholar.google.com.au/citations?view_op=view_citation&hl=zh-CN&user=R9iwlJcAAAAJ&cstart=20&pagesize=80&sortby=pubdate&citation_for_view=R9iwlJcAAAAJ:ZHo1McVdvXMC",
+                "Junhao Du, Chuqin Zhou, Yunuo Chen, <u>Guo Lu</u>",
+                "IEEE Transactions on Circuits and Systems for Video Technology, 2026.",
+            ),
+        )
+        for lookup_title, expected_title, url, authors, venue in expected:
+            with self.subTest(title=expected_title):
+                self.assertIn(lookup_title, self.homepage)
+                entry = publication_entry(self.homepage, lookup_title)
+                decoded_entry = html.unescape(entry)
+                title_link = re.search(
+                    r'<h3\b[^>]*>\s*<a\s+href="([^"]+)">\s*(.*?)\s*</a>\s*</h3>',
+                    decoded_entry,
+                    flags=re.DOTALL,
+                )
+                self.assertIsNotNone(title_link)
+                self.assertEqual(url, title_link.group(1))
+                self.assertEqual(expected_title, " ".join(title_link.group(2).split()))
+                authors_block = re.search(
+                    r'<div class="pub-authors"[^>]*>\s*(.*?)\s*</div>',
+                    decoded_entry,
+                    flags=re.DOTALL,
+                )
+                self.assertIsNotNone(authors_block)
+                self.assertEqual(authors, " ".join(authors_block.group(1).split()))
+                venue_block = re.search(
+                    r'<div class="pub-publication">\s*<em>(.*?)</em>',
+                    decoded_entry,
+                    flags=re.DOTALL,
+                )
+                self.assertIsNotNone(venue_block)
+                self.assertEqual(venue, " ".join(venue_block.group(1).split()))
+                self.assertEqual(1, entry.count("<u>Guo Lu</u>"))
+                self.assertEqual(1, entry.count("<u>"))
+                self.assertEqual(1, entry.count("</u>"))
+
+    def test_2026_publications_have_confirmed_order(self):
+        publications = html.unescape(section(self.homepage, "publications"))
+        titles = (
+            "Next-frame Decoding for Ultra-Low-Bitrate Image Compression with Video Diffusion Priors",
+            "Every Packet Counts: Dispersing Information for Loss-Resilient Learned Image Compression",
+            "Diff-VF: Training-free High-quality Long Video Generation via Diffusion Model",
+            "Large Language Model for Lossless Image Compression with Visual Prompts",
+            "Generative Video Communications: Concepts, Key Technologies, and Future Research Trends",
+            "Unified Spatiotemporal Token Compression for Video-LLMs at Ultra-Low Retention",
+            "Adaptive Learned Image Compression with Graph Neural Networks",
+            "Content-Aware Mamba for Learned Image Compression",
+        )
+        missing_titles = tuple(title for title in titles if title not in publications)
+        self.assertEqual((), missing_titles)
+        positions = [publications.index(title) for title in titles]
+        self.assertEqual(sorted(positions), positions)
+        confirmed_order = tuple(sorted(titles, key=publications.index))
+        self.assertEqual(
+            "Diff-VF: Training-free High-quality Long Video Generation via Diffusion Model",
+            confirmed_order[2],
+        )
+        self.assertEqual(
+            "Large Language Model for Lossless Image Compression with Visual Prompts",
+            confirmed_order[3],
+        )
+        self.assertEqual(1, publications.count("[ACMMM'26]"))
+
+    def test_professional_services_have_confirmed_2026_roles(self):
+        services = html.unescape(section(self.homepage, "services"))
+        associate_editor = "Associate Editor, IEEE T-CSVT, 2025"
+        confirmed_roles = (
+            "Guest Editor, IEEE Journal on Emerging and Selected Topics in Circuits and Systems (JETCAS) Special Issue on “When Large Models Meet Video Coding: Synergies, Systems, and Hardware Challenges,” 2026.",
+            "Challenge Organizer, The Challenge on Ultra-Low Bitrate Image Compression @ ECCV 2026.",
+            "Area Chair, International Conference on Learning Representations (ICLR), 2025, 2026, 2027.",
+            "Area Chair, Annual Conference on Neural Information Processing Systems (NeurIPS), 2025, 2026.",
+            "Senior PC, AAAI, 2021, 2026, 2027.",
+        )
+        self.assertEqual(1, services.count(associate_editor))
+        for role in confirmed_roles:
+            with self.subTest(role=role):
+                self.assertEqual(1, services.count(role))
+                self.assertLess(services.index(associate_editor), services.index(role))
+        for stale_role in (
+            "International Conference on Learning Representations(ICLR), 2025.",
+            "Annual Conference on Neural Information Processing Systems(NeurIPS), 2025.",
+            "Senior PC, AAAI 2021.",
+        ):
+            with self.subTest(stale_role=stale_role):
+                self.assertNotIn(stale_role, services)
+        self.assertNotIn("submission deadline", services.lower())
+        self.assertNotIn("June 1, 2026", services)
+        for preserved_role in (
+            "IEEE VSPC-TC Member, 2025",
+            "LAC-Technical Program Chairs, ICASSP Satellite Event Suzhou, China. 2025",
+            "Challenge Organizer, Ultra-low Bitrate Video Compression at VCIP, 2025.",
+        ):
+            with self.subTest(preserved_role=preserved_role):
+                self.assertIn(preserved_role, services)
 
     def test_contact_uses_obfuscated_plain_text_and_no_mailto(self):
         envelope_link = re.compile(
@@ -206,47 +351,141 @@ class HomepageContentTests(unittest.TestCase):
             with self.subTest(path=path.relative_to(ROOT).as_posix()):
                 self.assertNotRegex(read_text(path), PUBLIC_COUNTER_MARKER)
 
-    def test_all_news_navigation_items_are_commented_and_none_are_active(self):
+    def test_all_body_pages_have_active_news_navigation(self):
         news_item = (
             r'<li class="nav-item"><a href="https://guolusjtu\.github\.io/'
             r'guoluhomepage/#news">News</a></li>'
         )
         commented_item = re.compile(r"<!--\s*" + news_item + r"\s*-->")
         active_item = re.compile(news_item)
-        commented_count = 0
-        active_count = 0
         for path in self.html_files:
             page = read_text(path)
-            commented_count += len(commented_item.findall(page))
             page_without_comments = re.sub(r"<!--.*?-->", "", page, flags=re.DOTALL)
-            active_count += len(active_item.findall(page_without_comments))
-        self.assertEqual(19, commented_count)
-        self.assertEqual(0, active_count)
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                if "</body>" in page:
+                    self.assertEqual(1, len(active_item.findall(page_without_comments)))
+                    self.assertEqual(0, len(commented_item.findall(page)))
+                else:
+                    self.assertEqual(0, len(active_item.findall(page_without_comments)))
+                    self.assertEqual(0, len(commented_item.findall(page)))
 
-    def test_news_archive_body_and_known_titles_are_preserved(self):
-        archive_bytes = NEWS_ARCHIVE.read_bytes().replace(b"\r\n", b"\n")
-        separator = b"</nav>"
-        footer = b'<footer class="site-footer">'
-        self.assertIn(separator, archive_bytes)
-        self.assertIn(footer, archive_bytes)
-        archive_body = archive_bytes.split(separator, 1)[1].split(footer, 1)[0]
-        self.assertEqual(
-            "ca28e137c805d35fe170d5c247dd58ca56435a52679c1248111769a571fd0f52",
-            hashlib.sha256(archive_body).hexdigest(),
+    def test_homepage_news_has_latest_six_and_archive_link(self):
+        self.assertEqual(1, self.homepage.count('id="news"'))
+        self.assertLess(self.homepage.index('id="bio"'), self.homepage.index('id="news"'))
+        self.assertLess(
+            self.homepage.index('id="news"'), self.homepage.index('id="publications"')
         )
-        archive_text = archive_body.decode("utf-8")
-        for title in (
-            "One paper accepted at ICLR&#39;20",
-            "One paper accepted at TON",
-            "One paper accepted at AAAI&#39;20",
-            "One paper accepted at TMC",
-            "One paper accepted at NIPS&#39;19",
-            "GENE accepted at ERL&#39;19 as a Spotlight Talk",
-            "One paper accepted at NIPS&#39;18",
-            "One paper accepted at INFOCOM&#39;18",
-        ):
-            with self.subTest(title=title):
-                self.assertIn(title, archive_text)
+        news = html.unescape(section(self.homepage, "news"))
+        self.assertEqual(6, len(re.findall(r"<li\b", news)))
+        positions = []
+        for item in NEWS_ITEMS:
+            with self.subTest(item=item):
+                self.assertEqual(1, news.count(item))
+                positions.append(news.index(item))
+        self.assertEqual(sorted(positions), positions)
+        more_news_links = re.findall(
+            r'<a\b[^>]*href="(?:https://guolusjtu\.github\.io)?/guoluhomepage/news/"[^>]*>\s*More News\s*</a>',
+            news,
+            flags=re.DOTALL,
+        )
+        self.assertEqual(1, len(more_news_links))
+
+    def test_news_archive_has_exact_2026_items(self):
+        archive = read_text(NEWS_ARCHIVE)
+        decoded_archive = html.unescape(archive)
+        ids = tuple(fragment for fragment, _, _ in NEWS_FEED_ITEMS)
+        self.assertEqual(6, len(re.findall(r'id="2026-[^"]+"', archive)))
+        positions = []
+        for index, (fragment, _, expected_text) in enumerate(NEWS_FEED_ITEMS):
+            with self.subTest(fragment=fragment):
+                marker = f'id="{fragment}"'
+                self.assertEqual(1, archive.count(marker))
+                marker_position = archive.index(marker)
+                positions.append(marker_position)
+                block_start = archive.rfind("<", 0, marker_position)
+                if index + 1 < len(ids):
+                    next_position = archive.index(f'id="{ids[index + 1]}"')
+                    block_end = archive.rfind("<", 0, next_position)
+                else:
+                    block_end = archive.index('<footer class="site-footer">', marker_position)
+                block = html.unescape(archive[block_start:block_end])
+                self.assertEqual(1, block.count(expected_text))
+                self.assertEqual(1, decoded_archive.count(expected_text))
+                rendered = re.sub(r"<[^>]+>", " ", block)
+                rendered = " ".join(rendered.split())
+                self.assertEqual(expected_text, rendered)
+        self.assertEqual(sorted(positions), positions)
+        for marker in LEGACY_NEWS_MARKERS:
+            with self.subTest(marker=marker):
+                self.assertNotIn(html.unescape(marker), decoded_archive)
+
+    def test_news_feed_has_exact_2026_items(self):
+        feed_text = read_text(NEWS_FEED)
+        root = ET.fromstring(feed_text)
+        channel = root.find("channel")
+        self.assertIsNotNone(channel)
+        atom_link_tag = "{http://www.w3.org/2005/Atom}link"
+        metadata = {
+            child.tag: child.text
+            for child in channel
+            if child.tag not in {"item", atom_link_tag}
+        }
+        self.assertEqual(
+            {
+                "title": "News | Guo Lu's Homepage",
+                "link": "https://guolusjtu.github.io/guoluhomepage/news/",
+                "description": "News from Guo Lu's Homepage",
+                "language": "en-us",
+                "copyright": "© 2020–2026 Guo Lu",
+                "lastBuildDate": "Tue, 18 Aug 2026 00:00:00 +0800",
+            },
+            metadata,
+        )
+        atom_links = channel.findall(atom_link_tag)
+        self.assertEqual(1, len(atom_links))
+        self.assertEqual(
+            {
+                "href": "https://guolusjtu.github.io/guoluhomepage/news/index.xml",
+                "rel": "self",
+                "type": "application/rss+xml",
+            },
+            atom_links[0].attrib,
+        )
+        items = channel.findall("item")
+        self.assertEqual(6, len(items))
+        for item, (fragment, title, description) in zip(items, NEWS_FEED_ITEMS):
+            with self.subTest(fragment=fragment):
+                expected_url = (
+                    "https://guolusjtu.github.io/guoluhomepage/news/#" + fragment
+                )
+                self.assertEqual(title, item.findtext("title"))
+                self.assertEqual(description, item.findtext("description"))
+                self.assertEqual(expected_url, item.findtext("link"))
+                guid = item.find("guid")
+                self.assertIsNotNone(guid)
+                self.assertEqual(expected_url, guid.text)
+                self.assertEqual("true", guid.get("isPermaLink"))
+                self.assertIsNone(item.find("pubDate"))
+        decoded_feed = html.unescape(feed_text)
+        self.assertNotIn("Zongqing", decoded_feed)
+        for marker in LEGACY_NEWS_MARKERS:
+            with self.subTest(marker=marker):
+                self.assertNotIn(html.unescape(marker), decoded_feed)
+        self.assertNotRegex(decoded_feed, r"/news/(?!#|index\.xml)[^<#\s]+/")
+
+    def test_news_directory_has_no_detail_pages(self):
+        files = {
+            path.relative_to(ROOT).as_posix()
+            for path in NEWS_ARCHIVE.parent.rglob("*")
+            if path.is_file()
+        }
+        directories = {
+            path.relative_to(ROOT).as_posix()
+            for path in NEWS_ARCHIVE.parent.rglob("*")
+            if path.is_dir()
+        }
+        self.assertEqual({"news/index.html", "news/index.xml"}, files)
+        self.assertEqual(set(), directories)
 
     def test_unrelated_projects_anchors_are_preserved(self):
         projects_count = sum(
