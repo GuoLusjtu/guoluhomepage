@@ -12,6 +12,47 @@
 
 ## Chunk 1: Analytics migration and deployment
 
+### Task 0: Create the isolated implementation worktree
+
+**Files:**
+- Use: `.gitignore`
+- Create worktree: `.worktrees/cloudflare-web-analytics`
+- Create branch: `codex/cloudflare-web-analytics`
+
+- [ ] **Step 1: Verify the main worktree and ignore rule**
+
+Run from the repository root:
+
+```powershell
+git status --short --branch
+git check-ignore -v --no-index .worktrees/test
+$BASE_SHA = git rev-parse HEAD
+Write-Output $BASE_SHA
+```
+
+Expected: `master` is clean, `.worktrees/` is ignored by the committed `.gitignore`, and `BASE_SHA` records the exact documentation-only starting commit. At execution time, `master` is expected to be four commits ahead of `origin/master`; record the actual count rather than relying on a hard-coded SHA.
+
+- [ ] **Step 2: Create the feature branch and worktree**
+
+Run:
+
+```powershell
+git worktree add ".worktrees/cloudflare-web-analytics" -b "codex/cloudflare-web-analytics"
+```
+
+Expected: the worktree is created from `BASE_SHA` at `C:\Users\user\Documents\ChatGPT\个人主页\.worktrees\cloudflare-web-analytics`.
+
+- [ ] **Step 3: Verify the isolated baseline**
+
+Run from the new worktree:
+
+```powershell
+git status --short --branch
+& 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -B tests\test_homepage_content.py -v
+```
+
+Expected: clean `codex/cloudflare-web-analytics` branch and the existing 13/13 tests pass.
+
 ### Task 1: Add analytics regression coverage and establish RED
 
 **Files:**
@@ -85,7 +126,10 @@ Add these methods to `HomepageContentTests`:
             with self.subTest(path=path):
                 page = read_text(path)
                 self.assertEqual(1, page.count(CLOUDFLARE_BEACON))
-                self.assertLess(page.index(CLOUDFLARE_BEACON), page.rindex("</body>"))
+                body_end = page.rindex("</body>")
+                self.assertTrue(
+                    page[:body_end].rstrip().endswith(CLOUDFLARE_BEACON)
+                )
                 self.assertEqual(
                     1,
                     page.count("7f0b11c30fc344bfb55c572509aea6d0"),
@@ -126,7 +170,7 @@ Run:
 & 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -B tests\test_homepage_content.py -v
 ```
 
-Expected: 18 tests run. The Cloudflare installation test fails because no beacon is installed, and the legacy-GA-removal test fails because all 19 content pages still contain the old integration. The other 16 tests pass, including the redirect-stub byte hash and all existing preservation tests.
+Expected: 18 test methods run. The Cloudflare installation method produces 19 failing subtests because no content page has a beacon, and the legacy-GA-removal method produces 19 failing subtests because all 19 content pages retain GA. Unittest reports `FAILED (failures=38)` across those two methods. The other 16 methods pass, including the redirect-stub byte hash and all existing preservation tests.
 
 - [ ] **Step 5: Commit the RED regression tests**
 
@@ -137,7 +181,7 @@ git add -- tests/test_homepage_content.py
 git commit -m "test: define analytics migration requirements"
 ```
 
-Expected: one commit modifying only the test file, with the intended 2-failure RED state documented.
+Expected: one commit modifying only the test file, with the intended 38 failing subtests across two test methods documented.
 
 ### Task 2: Replace legacy Google Analytics with Cloudflare
 
@@ -203,7 +247,81 @@ Run: `rg -n "UA-88925956-1|GoogleAnalyticsObject|www.google-analytics.com/analyt
 
 Expected: no matches outside ignored `.worktrees`; the regression suite provides the authoritative filtered check.
 
-- [ ] **Step 5: Commit the migration**
+### Task 3: Local smoke test and whole-branch verification
+
+**Files:**
+- Test: `index.html`
+- Test: `news/index.html`
+- Test: `tags/community/index.html`
+
+- [ ] **Step 1: Run the deterministic local smoke script before committing**
+
+Run this complete PowerShell script from the isolated worktree:
+
+```powershell
+$pythonExe = 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+$beacon = '<!-- Cloudflare Web Analytics --><script type=''module'' src=''https://static.cloudflareinsights.com/beacon.min.js'' data-cf-beacon=''{"token": "7f0b11c30fc344bfb55c572509aea6d0"}''></script><!-- End Cloudflare Web Analytics -->'
+$targets = @(
+    @{ Url = 'http://127.0.0.1:8000/'; Marker = "GUO LU's Homepage" },
+    @{ Url = 'http://127.0.0.1:8000/news/'; Marker = '<h1>News</h1>' },
+    @{ Url = 'http://127.0.0.1:8000/tags/community/'; Marker = 'Community' }
+)
+$server = Start-Process -FilePath $pythonExe -ArgumentList '-m','http.server','--bind','127.0.0.1','8000' -WorkingDirectory (Get-Location).Path -WindowStyle Hidden -PassThru
+try {
+    $ready = $false
+    for ($attempt = 0; $attempt -lt 20; $attempt++) {
+        try {
+            $null = Invoke-WebRequest -UseBasicParsing $targets[0].Url -TimeoutSec 2
+            $ready = $true
+            break
+        } catch {
+            Start-Sleep -Milliseconds 250
+        }
+    }
+    if (-not $ready) { throw 'Local server did not become ready' }
+
+    foreach ($target in $targets) {
+        $response = Invoke-WebRequest -UseBasicParsing $target.Url -TimeoutSec 5
+        if ([int]$response.StatusCode -ne 200) { throw "Unexpected status for $($target.Url)" }
+        if (-not $response.Content.Contains($target.Marker)) { throw "Missing marker for $($target.Url)" }
+        if (($response.Content.Split($beacon).Count - 1) -ne 1) { throw "Beacon count mismatch for $($target.Url)" }
+        foreach ($forbidden in @('UA-88925956-1','GoogleAnalyticsObject','www.google-analytics.com/analytics.js')) {
+            if ($response.Content.Contains($forbidden)) { throw "Legacy GA remains in $($target.Url)" }
+        }
+    }
+} finally {
+    if (-not $server.HasExited) {
+        Stop-Process -Id $server.Id -Force
+        $server.WaitForExit()
+    }
+}
+if (Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue) {
+    throw 'Port 8000 is still listening'
+}
+try {
+    $null = Invoke-WebRequest -UseBasicParsing $targets[0].Url -TimeoutSec 2
+    throw 'Server still responds after cleanup'
+} catch [System.Net.WebException] {
+    Write-Output 'Server cleanup verified'
+}
+```
+
+Expected: all three URLs return HTTP 200, markers and exactly one beacon are present, legacy GA is absent, the exact server PID exits, port 8000 closes, and a follow-up request is refused.
+
+- [ ] **Step 2: Run fresh final verification**
+
+Run:
+
+```powershell
+$BASE_SHA = git merge-base HEAD master
+& 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -B tests\test_homepage_content.py -v
+git diff --check $BASE_SHA..HEAD
+git status --short --branch
+```
+
+Expected before the migration commit: 18/18 tests pass and the working diff is clean except for the 19 planned content-page edits. Use the recorded `BASE_SHA` for all whole-range comparisons; do not use `HEAD~2`.
+
+- [ ] **Step 3: Commit the migration**
 
 Run:
 
@@ -214,44 +332,18 @@ git commit -m "feat: add private Cloudflare web analytics"
 
 Expected: one commit changing only the 19 content pages.
 
-### Task 3: Local smoke test and whole-branch verification
+- [ ] **Step 4: Verify the complete two-commit range and clean state**
 
-**Files:**
-- Test: `index.html`
-- Test: `news/index.html`
-- Test: `tags/community/index.html`
-
-- [ ] **Step 1: Start the local server with a deterministic Windows process handle**
-
-Use the exact bundled Python executable with `Start-Process -WindowStyle Hidden -PassThru` and arguments `-m http.server --bind 127.0.0.1 8000`. Retain the returned PID for cleanup.
-
-- [ ] **Step 2: Smoke-test three representative pages**
-
-Request:
-
-- `http://127.0.0.1:8000/`
-- `http://127.0.0.1:8000/news/`
-- `http://127.0.0.1:8000/tags/community/`
-
-Expected: all return HTTP 200, retain their expected page markers, contain the exact Cloudflare beacon once, and contain no legacy Google Analytics markers.
-
-- [ ] **Step 3: Stop the exact server PID and verify cleanup**
-
-Stop only the PID returned in Step 1, wait for exit, and verify port 8000 is no longer listening and subsequent requests are refused.
-
-- [ ] **Step 4: Run fresh final verification**
-
-Run:
+Run the 18-test suite again with `-B`, then run:
 
 ```powershell
-& 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -B tests\test_homepage_content.py -v
-git diff --check HEAD~2..HEAD
+$BASE_SHA = git merge-base HEAD master
+git diff --check $BASE_SHA..HEAD
+git diff --stat $BASE_SHA..HEAD
 git status --short --branch
 ```
 
-Expected: 18/18 tests pass, diff check is clean, and the isolated worktree has no tracked or untracked changes.
-
-Review the full two-commit implementation range. Confirm only the test file and 19 content pages changed; all 12 redirect stubs are identical to the base commit.
+Expected: clean feature worktree. The range contains only `tests/test_homepage_content.py` plus the 19 content pages; all 12 redirect stubs are identical to `BASE_SHA`.
 
 ### Task 4: Integrate, deploy, and verify production
 
@@ -267,7 +359,7 @@ Use a fast-forward merge after fresh tests pass on the feature branch.
 
 Run the bundled Python suite with `-B` from the main working tree. The `.worktrees` exclusion regression must keep the count at 18 tests even while the isolated worktree exists.
 
-Expected: 18/18 tests pass.
+Expected: 18/18 tests pass. Before push, `master` is expected to be six commits ahead of `origin/master`: the four already-pending documentation commits plus the two reviewed implementation commits. Verify the actual count dynamically.
 
 - [ ] **Step 3: Push `master` and verify the remote SHA**
 
@@ -275,9 +367,9 @@ Run `git push origin master`, then compare `git ls-remote origin refs/heads/mast
 
 Expected: identical commit IDs.
 
-- [ ] **Step 4: Verify the live deployment**
+- [ ] **Step 4: Verify all three live URLs and execute the beacon**
 
-Request the live homepage with a cache-busting query. Confirm HTTP 200, exactly one expected Cloudflare beacon/token, and no legacy GA markers. Repeat for `/news/` and one canonical tag page if deployment propagation is incomplete on the first request.
+Request all three live URLs with cache-busting queries: the homepage, `/news/`, and `/tags/community/`. For every URL, confirm HTTP 200, exactly one expected Cloudflare beacon/token, and no legacy GA markers. Then open the deployed homepage in a JavaScript-capable browser and refresh once so the beacon actually executes; a PowerShell source request alone does not create an analytics event.
 
 - [ ] **Step 5: Confirm the first event in Cloudflare**
 

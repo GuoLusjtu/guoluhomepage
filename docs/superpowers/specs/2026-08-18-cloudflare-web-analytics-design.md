@@ -6,7 +6,7 @@ Add private, privacy-focused traffic analytics to the complete static GitHub Pag
 
 ## Integration
 
-Audit all 31 tracked HTML files, partitioned as 19 full content pages and 12 Hugo redirect stubs. Insert the following Cloudflare Web Analytics beacon exactly once in each of the 19 full content pages, immediately before the closing `</body>` tag:
+Audit all 31 repository-filesystem HTML files outside the ignored `.worktrees` directory, partitioned as 19 full content pages and 12 Hugo redirect stubs. Insert the following Cloudflare Web Analytics beacon exactly once in each of the 19 full content pages, immediately before the closing `</body>` tag:
 
 ```html
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7f0b11c30fc344bfb55c572509aea6d0"}'></script><!-- End Cloudflare Web Analytics -->
@@ -37,7 +37,7 @@ The owner will use Cloudflare Dashboard → Analytics & Logs → Web Analytics �
 
 Extend the existing standard-library regression suite so it fails before implementation and then verifies:
 
-- exactly 31 repository HTML pages are audited, excluding project-local `.worktrees`, and partition into 19 content pages with `</body>` plus 12 redirect stubs without it;
+- exactly 31 repository-filesystem HTML pages are audited, excluding project-local `.worktrees`, and partition into 19 content pages with `</body>` plus 12 redirect stubs without it;
 - every content page contains exactly one complete beacon snippet using the expected Cloudflare script URL and token, placed before `</body>`;
 - all 12 redirect stubs remain byte-for-byte unchanged and contain no Cloudflare beacon;
 - the legacy Google Analytics loader, property ID, object initializer, and `ga(...)` calls are absent from all tracked HTML;
