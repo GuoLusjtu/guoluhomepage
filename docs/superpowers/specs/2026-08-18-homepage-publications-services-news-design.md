@@ -62,12 +62,12 @@ Do not show the JETCAS submission deadline. Do not show a month for the challeng
 
 Use these six concise entries, in this exact newest-first order and without paper titles:
 
-1. `August 2026 — Serving as an Area Chair for ICLR and as a Senior PC member for AAAI.`
-2. `August 2026 — Two papers were accepted by ACM TOMM and IEEE T-CSVT.`
-3. `July 2026 — Two papers were accepted by ACM MM 2026, and one paper was accepted by ECCV 2026.`
-4. `June 2026 — Organizing the Challenge on Ultra-Low Bitrate Image Compression at ECCV 2026.`
-5. `March 2026 — Serving as a Guest Editor for an IEEE JETCAS Special Issue.`
-6. `February 2026 — Two papers were accepted by CVPR 2026.`
+1. `2026.8 Serving as an Area Chair for ICLR and as a Senior PC member for AAAI.`
+2. `2026.8 Two papers were accepted by ACM TOMM and IEEE T-CSVT.`
+3. `2026.7 Two papers were accepted by ACM MM 2026, and one paper was accepted by ECCV 2026.`
+4. `2026.6 Organizing the Challenge on Ultra-Low Bitrate Image Compression at ECCV 2026.`
+5. `2026.3 Serving as a Guest Editor for an IEEE JETCAS Special Issue.`
+6. `2026.2 Two papers were accepted by CVPR 2026.`
 
 The ACM MM count intentionally reports two accepted papers even though the curated publication list shows only one. Do not add an ICLR 2026 paper-acceptance item or a NeurIPS invitation item.
 

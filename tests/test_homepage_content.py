@@ -11,12 +11,12 @@ HOMEPAGE = ROOT / "index.html"
 NEWS_ARCHIVE = ROOT / "news" / "index.html"
 NEWS_FEED = ROOT / "news" / "index.xml"
 NEWS_ITEMS = (
-    "August 2026 — Serving as an Area Chair for ICLR and as a Senior PC member for AAAI.",
-    "August 2026 — Two papers were accepted by ACM TOMM and IEEE T-CSVT.",
-    "July 2026 — Two papers were accepted by ACM MM 2026, and one paper was accepted by ECCV 2026.",
-    "June 2026 — Organizing the Challenge on Ultra-Low Bitrate Image Compression at ECCV 2026.",
-    "March 2026 — Serving as a Guest Editor for an IEEE JETCAS Special Issue.",
-    "February 2026 — Two papers were accepted by CVPR 2026.",
+    "2026.8 Serving as an Area Chair for ICLR and as a Senior PC member for AAAI.",
+    "2026.8 Two papers were accepted by ACM TOMM and IEEE T-CSVT.",
+    "2026.7 Two papers were accepted by ACM MM 2026, and one paper was accepted by ECCV 2026.",
+    "2026.6 Organizing the Challenge on Ultra-Low Bitrate Image Compression at ECCV 2026.",
+    "2026.3 Serving as a Guest Editor for an IEEE JETCAS Special Issue.",
+    "2026.2 Two papers were accepted by CVPR 2026.",
 )
 LEGACY_NEWS_MARKERS = (
     "One paper accepted at ICLR&#39;20",
