@@ -7,6 +7,24 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 HOMEPAGE = ROOT / "index.html"
 NEWS_ARCHIVE = ROOT / "news" / "index.html"
+CLOUDFLARE_TOKEN = "7f0b11c30fc344bfb55c572509aea6d0"
+CLOUDFLARE_BEACON = (
+    "<!-- Cloudflare Web Analytics --><script type='module' "
+    "src='https://static.cloudflareinsights.com/beacon.min.js' "
+    f"data-cf-beacon='{{\"token\": \"{CLOUDFLARE_TOKEN}\"}}'></script>"
+    "<!-- End Cloudflare Web Analytics -->"
+)
+LEGACY_ANALYTICS_MARKERS = (
+    "UA-88925956-1",
+    "GoogleAnalyticsObject",
+    "www.google-analytics.com/analytics.js",
+)
+LEGACY_GA_CALL = re.compile(r"\bga\s*\(")
+PUBLIC_COUNTER_MARKER = re.compile(
+    r"busuanzi|hitwebcounter|visitor[-_ ]?counter|page[-_ ]?counter|"
+    r"site[-_ ]?(?:pv|uv)|访问量|访客数|浏览量",
+    re.IGNORECASE,
+)
 
 
 def read_text(path):
@@ -116,6 +134,72 @@ class HomepageContentTests(unittest.TestCase):
         for path in self.html_files:
             with self.subTest(path=path):
                 self.assertNotIn(".worktrees", path.relative_to(ROOT).parts)
+
+    def test_analytics_audit_classifies_all_repository_html_files(self):
+        content_pages = tuple(
+            path for path in self.html_files if "</body>" in read_text(path)
+        )
+        redirect_pages = tuple(
+            path for path in self.html_files if "</body>" not in read_text(path)
+        )
+        self.assertEqual(31, len(self.html_files))
+        self.assertEqual(19, len(content_pages))
+        self.assertEqual(12, len(redirect_pages))
+        self.assertEqual(set(self.html_files), set(content_pages) | set(redirect_pages))
+        self.assertFalse(set(content_pages) & set(redirect_pages))
+
+    def test_content_pages_have_one_cloudflare_beacon_before_body_end(self):
+        content_pages = (
+            path for path in self.html_files if "</body>" in read_text(path)
+        )
+        for path in content_pages:
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                page = read_text(path)
+                self.assertEqual(1, page.count(CLOUDFLARE_BEACON))
+                self.assertEqual(1, page.count(CLOUDFLARE_TOKEN))
+                body_end = page.rindex("</body>")
+                self.assertTrue(
+                    page[:body_end].rstrip().endswith(CLOUDFLARE_BEACON)
+                )
+
+    def test_redirect_stubs_are_unmodified_and_have_no_cloudflare_beacon(self):
+        redirect_pages = sorted(
+            (
+                path
+                for path in self.html_files
+                if "</body>" not in read_text(path)
+            ),
+            key=lambda path: path.relative_to(ROOT).as_posix().encode("utf-8"),
+        )
+        snapshot = b"".join(
+            path.relative_to(ROOT).as_posix().encode("utf-8")
+            + b"\0"
+            + path.read_bytes()
+            + b"\0"
+            for path in redirect_pages
+        )
+        for path in redirect_pages:
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                self.assertNotIn(CLOUDFLARE_BEACON, read_text(path))
+        self.assertEqual(
+            "fb95fbe62cb3204583afd7b2cba254184babdff19b2e8add1208b973a894e162",
+            hashlib.sha256(snapshot).hexdigest(),
+        )
+
+    def test_all_html_files_exclude_legacy_google_analytics(self):
+        for path in self.html_files:
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                page = read_text(path)
+                legacy_matches = [
+                    marker for marker in LEGACY_ANALYTICS_MARKERS if marker in page
+                ]
+                legacy_matches.extend(LEGACY_GA_CALL.findall(page))
+                self.assertEqual([], legacy_matches)
+
+    def test_all_html_files_exclude_visible_public_counters(self):
+        for path in self.html_files:
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                self.assertNotRegex(read_text(path), PUBLIC_COUNTER_MARKER)
 
     def test_all_news_navigation_items_are_commented_and_none_are_active(self):
         news_item = (
