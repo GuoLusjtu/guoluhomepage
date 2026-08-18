@@ -107,6 +107,9 @@ PROJECT_ASSET_SHA256 = {
     "netvision.png": "99e901387311b50b3daf1bd421416507fe3a4fa9d3a94c1c78239bdb47580f29",
     "teamphone.png": "968333aa69e3eb1ca404f1e484c0908ccd63d423ed6a45022e01b753bf2a3414",
 }
+PROJECT_SUMMARIES_SHA256 = (
+    "3bf39900daf774c964e14583d9cd9ecc780087668885b3b59683fd7c7bbeaa9f"
+)
 LEGACY_ANALYTICS_MARKERS = (
     "UA-88925956-1",
     "GoogleAnalyticsObject",
@@ -392,6 +395,13 @@ class HomepageContentTests(unittest.TestCase):
             flags=re.DOTALL,
         )
         self.assertEqual(5, len(summaries))
+        normalized_summaries = "\n".join(
+            normalized_rendered_text(summary) for summary in summaries
+        )
+        self.assertEqual(
+            PROJECT_SUMMARIES_SHA256,
+            hashlib.sha256(normalized_summaries.encode("utf-8")).hexdigest(),
+        )
         rendered_project = normalized_rendered_text(project)
         for title in PROJECT_TITLES:
             with self.subTest(title=title):
