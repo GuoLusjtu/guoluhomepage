@@ -60,6 +60,25 @@ RECRUITMENT_COPY = (
     "and postdoctoral fellows. Prospective applicants are welcome to send a CV "
     "and transcript by email."
 )
+BIOGRAPHY_COPY = (
+    "I am a tenure-track Associate Professor (Ph.D. supervisor) in the "
+    "Department of Electronic Engineering, Shanghai Jiao Tong University. "
+    "Before joining SJTU, I was an Assistant Professor at the Beijing Institute "
+    "of Technology (2020–2022). I received my Ph.D. degree in Electronic "
+    "Engineering from Shanghai Jiao Tong University in 2020. From Sep. 2017 to "
+    "Mar. 2019, I was a visiting researcher at the University of Sydney, working "
+    "with Prof. Wanli Ouyang and Prof. Dong Xu. My research interests include "
+    "video coding, multimedia processing, and efficient multimodal large "
+    "language models I serve as an Associate Editor for IEEE Transactions on "
+    "Circuits and Systems for Video Technology (T-CSVT) and as a Guest Editor "
+    "for journals including IJCV. I have served as an Area Chair for conferences "
+    "(e.g., ICLR and NeurIPS) and have organized tutorials/workshops on learned "
+    "compression at venues such as CVPR and ACM Multimedia. My honors include "
+    "the IEEE Visual Signal Processing and Communications Rising Star Award, "
+    "best paper awards at conferences such as VCIP/WCSP, and outstanding doctoral "
+    "dissertation awards (including awards from CSIG and Shanghai Jiao Tong "
+    "University)."
+)
 CHINESE_HOMEPAGE_URL = "https://icisee.sjtu.edu.cn/jiaoshiml/luguo.html"
 RETAINED_HTML_PATHS = (
     "404.html",
@@ -266,6 +285,57 @@ class HomepageContentTests(unittest.TestCase):
 
         self.assertNotRegex(bio, r'<span\b[^>]*style="[^"]*color\s*:\s*red')
         self.assertNotIn("CV/resume", bio)
+
+    def test_bio_starts_with_exact_about_me_heading_and_preserves_content(self):
+        bio = section(self.homepage, "bio")
+        description_columns = re.findall(
+            r'<div class="col-xs-12 col-md-8" itemprop="description">(.*)',
+            bio,
+            flags=re.DOTALL,
+        )
+        self.assertEqual(1, len(description_columns))
+        description = description_columns[0]
+        heading = '<h3 id="about-me-heading" class="about-me-heading">About Me</h3>'
+
+        first_visible_child = re.match(
+            r"\s*(?:<!--.*?-->\s*)*(<[^>]+>)",
+            description,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(first_visible_child)
+        self.assertEqual(heading, first_visible_child.group(1))
+        self.assertEqual(1, description.count(heading))
+        self.assertNotRegex(heading, r"\sstyle\s*=")
+
+        intro = re.match(
+            rf"\s*(?:<!--.*?-->\s*)*{re.escape(heading)}\s*<p>(.*?)</p>",
+            description,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(intro)
+        self.assertEqual(BIOGRAPHY_COPY, normalized_rendered_text(intro.group(1)))
+
+        callout = re.search(
+            r'<aside class="join-us-callout" aria-labelledby="join-us-heading">'
+            r"(.*?)</aside>",
+            description,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(callout)
+        callout_after_heading = callout.group(1).split("</h3>", 1)[1]
+        self.assertEqual(
+            RECRUITMENT_COPY,
+            normalized_rendered_text(callout_after_heading.split("</p>", 1)[0]),
+        )
+        self.assertIn(f'href="{CHINESE_HOMEPAGE_URL}"', callout.group(0))
+
+        stylesheet = read_text(STYLESHEET)
+        heading_blocks = css_rule_blocks(stylesheet, ".about-me-heading")
+        self.assertEqual(1, len(heading_blocks))
+        self.assertEqual(
+            {"margin": "0 0 16px", "font-weight": "600"},
+            css_declarations(heading_blocks[0]),
+        )
 
     def test_homepage_source_and_stylesheet_are_strict_utf8(self):
         for path in (HOMEPAGE, STYLESHEET):
