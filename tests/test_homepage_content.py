@@ -298,7 +298,7 @@ class HomepageContentTests(unittest.TestCase):
         heading = '<h3 id="about-me-heading" class="about-me-heading">About Me</h3>'
 
         first_visible_child = re.match(
-            r"\s*(?:<!--.*?-->\s*)*(<[^>]+>)",
+            r"\s*(?:<!--.*?-->\s*)*(<h3\b[^>]*>.*?</h3>|<[^>]+>)",
             description,
             flags=re.DOTALL,
         )
