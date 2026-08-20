@@ -223,6 +223,11 @@ def normalized_rendered_text(html_fragment):
     return " ".join(without_tags.split())
 
 
+def normalized_inline_rendered_text(html_fragment):
+    without_tags = re.sub(r"<[^>]+>", "", html.unescape(html_fragment))
+    return " ".join(without_tags.split())
+
+
 class HomepageContentTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -313,7 +318,10 @@ class HomepageContentTests(unittest.TestCase):
             flags=re.DOTALL,
         )
         self.assertIsNotNone(intro)
-        self.assertEqual(BIOGRAPHY_COPY, normalized_rendered_text(intro.group(1)))
+        self.assertEqual(
+            BIOGRAPHY_COPY,
+            normalized_inline_rendered_text(intro.group(1)),
+        )
 
         callout = re.search(
             r'<aside class="join-us-callout" aria-labelledby="join-us-heading">'
