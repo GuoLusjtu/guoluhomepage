@@ -9,16 +9,16 @@ Update only the homepage document title to improve search-result clarity while p
 - Modify only the existing `<title>` element in root `index.html`.
 - Replace `<title>GUO LU&#39;s Homepage</title>` with:
 
-  `<title>Guo Lu (&#40065;&#22269;) | SJTU | Video Coding &amp; Generative AI</title>`
+  `<title>Guo Lu (鲁国) | SJTU | Video Coding &amp; Generative AI</title>`
 
 - The decoded browser/search-engine title must be exactly `Guo Lu (` followed by the two Chinese characters for the name, then `) | SJTU | Video Coding & Generative AI`.
-- Use HTML character references for the Chinese name and ampersand so the source remains ASCII-safe and valid HTML while rendering the requested title exactly.
+- Keep the Chinese name as the approved literal UTF-8 characters and escape only the ampersand as `&amp;`, yielding valid HTML while rendering the requested title exactly.
 
 ## Metadata boundary
 
 - The current homepage has no `og:title` or `twitter:title`; do not add either field.
 - Preserve the existing meta description, canonical URL, all other head markup, schema-related markup, CSS, JavaScript, layout, and visible body content byte-for-byte.
-- Do not reformat `index.html` or touch any production file other than root `index.html`.
+- Do not reformat `index.html` or touch any production file other than root `index.html`. A regression test file may change solely to verify this production constraint.
 
 ## Verification
 
