@@ -80,6 +80,27 @@ BIOGRAPHY_COPY = (
     "University)."
 )
 CHINESE_HOMEPAGE_URL = "https://icisee.sjtu.edu.cn/jiaoshiml/luguo.html"
+SEO_TITLE_SOURCE = "Guo Lu (鲁国) | SJTU | Video Coding &amp; Generative AI"
+SEO_TITLE_RENDERED = "Guo Lu (鲁国) | SJTU | Video Coding & Generative AI"
+META_DESCRIPTION = (
+    "Associate Professor at Shanghai Jiao Tong University | Video Coding, "
+    "Multimedia Processing, and Efficient Multimodal LLMs"
+)
+LINKEDIN_URL = "https://www.linkedin.com/in/guo-lu-118a6592/"
+LINKEDIN_LIST_ITEM = (
+    '<li>\n'
+    f'                                <a href="{LINKEDIN_URL}" '
+    'aria-label="LinkedIn">\n'
+    '\n'
+    '                                    <i class="fa fa-linkedin big-icon" '
+    'aria-hidden="true"></i>\n'
+    '\n'
+    '                                </a>\n'
+    '                            </li>'
+)
+HOMEPAGE_CANONICAL_SHA256 = (
+    "edec456873a657e6c12c84907f718caca33af3fa7f006e58d51f5b18522a489a"
+)
 RETAINED_HTML_PATHS = (
     "404.html",
     "index.html",
@@ -246,6 +267,92 @@ class HomepageContentTests(unittest.TestCase):
         )
         self.assertIn(expected, self.homepage)
         self.assertNotIn('content="PhD-SJTU"', self.homepage)
+
+    def test_homepage_has_exact_seo_title_and_preserves_existing_seo_metadata(self):
+        source_titles = re.findall(r"<title>(.*?)</title>", self.homepage, re.DOTALL)
+        self.assertEqual([SEO_TITLE_SOURCE], source_titles)
+        self.assertEqual(SEO_TITLE_RENDERED, html.unescape(source_titles[0]))
+
+        title_metadata = re.findall(
+            r'<meta\b[^>]*\b(?:name|property)=["\'](?:og:title|twitter:title)["\'][^>]*>',
+            self.homepage,
+            flags=re.IGNORECASE,
+        )
+        self.assertEqual([], title_metadata)
+        self.assertEqual(
+            1,
+            self.homepage.count(
+                f'<meta name="description" content="{META_DESCRIPTION}">'
+            ),
+        )
+        self.assertEqual(
+            1,
+            self.homepage.count(f'<link rel="canonical" href="{SITE_BASE_URL}">'),
+        )
+
+    def test_social_icons_end_with_exact_linkedin_entry_after_github(self):
+        social_lists = re.findall(
+            r'<ul class="social-icon">(.*?)</ul>', self.homepage, flags=re.DOTALL
+        )
+        self.assertEqual(1, len(social_lists))
+        social = social_lists[0]
+        items = re.findall(r'<li>(.*?)</li>', social, flags=re.DOTALL)
+        self.assertEqual(4, len(items))
+
+        labels = []
+        for item in items:
+            if 'aria-label="Contact"' in item:
+                labels.append("Contact")
+            elif "ai-google-scholar" in item:
+                labels.append("Scholar")
+            elif "fa-github" in item:
+                labels.append("GitHub")
+            elif 'aria-label="LinkedIn"' in item:
+                labels.append("LinkedIn")
+        self.assertEqual(["Contact", "Scholar", "GitHub", "LinkedIn"], labels)
+
+        linkedin_items = re.findall(
+            rf'<li>\r?\n(?:(?!</li>).)*?href="{re.escape(LINKEDIN_URL)}"'
+            r'(?:(?!</li>).)*?</li>',
+            social,
+            flags=re.DOTALL,
+        )
+        self.assertEqual([LINKEDIN_LIST_ITEM], linkedin_items)
+        self.assertRegex(
+            social,
+            re.compile(
+            r'<li>(?:(?!</li>).)*?fa-github(?:(?!</li>).)*?</li>\s*'
+                + re.escape(LINKEDIN_LIST_ITEM),
+                flags=re.DOTALL,
+            ),
+        )
+        self.assertEqual(1, self.homepage.count(LINKEDIN_URL))
+        self.assertNotIn(LINKEDIN_URL, section(self.homepage, "contact"))
+        self.assertNotRegex(LINKEDIN_LIST_ITEM, r'\s(?:target|rel)=')
+        self.assertIn(
+            '<i class="fa fa-linkedin big-icon" aria-hidden="true"></i>',
+            LINKEDIN_LIST_ITEM,
+        )
+
+    def test_homepage_is_byte_for_byte_unchanged_except_approved_title_and_linkedin(self):
+        homepage = HOMEPAGE.read_bytes()
+        canonical = homepage.replace(
+            b"<title>GUO LU&#39;s Homepage</title>",
+            b"<title>__SEO_TITLE__</title>",
+        ).replace(
+            SEO_TITLE_SOURCE.encode("utf-8").join((b"<title>", b"</title>")),
+            b"<title>__SEO_TITLE__</title>",
+        )
+        linkedin_insertion = (
+            b"\r\n\r\n                            "
+            + LINKEDIN_LIST_ITEM.replace("\n", "\r\n").encode("utf-8")
+        )
+        self.assertLessEqual(canonical.count(linkedin_insertion), 1)
+        canonical = canonical.replace(linkedin_insertion, b"")
+        self.assertEqual(
+            HOMEPAGE_CANONICAL_SHA256,
+            hashlib.sha256(canonical).hexdigest(),
+        )
 
     def test_bio_has_exact_accessible_join_us_callout(self):
         bio = section(self.homepage, "bio")
