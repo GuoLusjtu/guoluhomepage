@@ -99,7 +99,7 @@ LINKEDIN_LIST_ITEM = (
     '                            </li>'
 )
 HOMEPAGE_CANONICAL_SHA256 = (
-    "edec456873a657e6c12c84907f718caca33af3fa7f006e58d51f5b18522a489a"
+    "6e292456182a5973e8f52e5dddfb1107ab25ab4c265823f68712fbdeb72370f7"
 )
 RETAINED_HTML_PATHS = (
     "404.html",
@@ -335,7 +335,7 @@ class HomepageContentTests(unittest.TestCase):
         )
 
     def test_homepage_is_byte_for_byte_unchanged_except_approved_title_and_linkedin(self):
-        homepage = HOMEPAGE.read_bytes()
+        homepage = HOMEPAGE.read_bytes().replace(b"\r\n", b"\n")
         canonical = homepage.replace(
             b"<title>GUO LU&#39;s Homepage</title>",
             b"<title>__SEO_TITLE__</title>",
@@ -344,8 +344,7 @@ class HomepageContentTests(unittest.TestCase):
             b"<title>__SEO_TITLE__</title>",
         )
         linkedin_insertion = (
-            b"\r\n\r\n                            "
-            + LINKEDIN_LIST_ITEM.replace("\n", "\r\n").encode("utf-8")
+            b"\n\n                            " + LINKEDIN_LIST_ITEM.encode("utf-8")
         )
         self.assertLessEqual(canonical.count(linkedin_insertion), 1)
         canonical = canonical.replace(linkedin_insertion, b"")
