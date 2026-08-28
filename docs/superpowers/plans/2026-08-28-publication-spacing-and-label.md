@@ -22,20 +22,36 @@
 
 - [ ] **Step 1: Write failing tests**
 
-Assert that `.publications-page .publication-entry` uses `margin-bottom: 12px`, and that `Selected corresponding-author publications.` appears once directly after the `Recent Publications` heading and before `More Publications`.
+Add `test_publication_entries_use_compact_spacing` to assert that `.publications-page .publication-entry` uses `margin-bottom: 12px`. Add `test_recent_publications_has_corresponding_author_label` to assert that `Selected corresponding-author publications.` appears once directly after the `Recent Publications` heading and before `More Publications`.
 
 - [ ] **Step 2: Run focused tests and confirm they fail**
 
-Run the two new focused `unittest` cases. Expected: both fail before implementation.
+Run:
+
+```powershell
+python -m unittest tests.test_publications_page.PublicationsPageTests.test_publication_entries_use_compact_spacing -v
+python -m unittest tests.test_homepage_content.HomepageContentTests.test_recent_publications_has_corresponding_author_label -v
+```
+
+Expected: both fail before implementation.
 
 - [ ] **Step 3: Implement the minimal changes**
 
-Change the standalone-page entry margin from `18px` to `12px`. Add a short paragraph containing the approved sentence below the homepage heading.
+Change the standalone-page entry margin from `18px` to `12px`. Add a short paragraph containing the approved sentence below the homepage heading. Update the existing homepage preservation normalization and publications-section canonical hash only for this approved insertion so the preservation tests continue to reject unrelated changes.
 
 - [ ] **Step 4: Verify**
 
-Run the focused cases, the full `unittest` suite, and `git diff --check`. Expected: all pass and no whitespace errors.
+Run:
+
+```powershell
+python -m unittest tests.test_publications_page.PublicationsPageTests.test_publication_entries_use_compact_spacing -v
+python -m unittest tests.test_homepage_content.HomepageContentTests.test_recent_publications_has_corresponding_author_label -v
+python -m unittest discover -s tests -v
+git diff --check
+```
+
+Expected: both focused cases pass, all 68 existing tests plus the 2 new tests pass, and `git diff --check` prints no errors.
 
 - [ ] **Step 5: Commit and push**
 
-Commit only the scoped implementation and tests, then push `master`.
+Run `git branch --show-current` and require `master`. Inspect `git diff -- css/hugo-academic.css index.html tests/test_homepage_content.py tests/test_publications_page.py`, stage only those four files, commit them, verify the workspace is clean, then run `git push origin master`.
