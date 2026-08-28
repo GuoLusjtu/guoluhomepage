@@ -52,6 +52,7 @@ CLOUDFLARE_BEACON = (
 )
 SITE_BASE_URL = "https://guolusjtu.github.io/guoluhomepage/"
 PUBLICATIONS_URL = SITE_BASE_URL + "#publications"
+PUBLICATION_ARCHIVE_URL = SITE_BASE_URL + "publication/"
 OWNER_SCHOLAR_URL = (
     "https://scholar.google.com/citations?user=R9iwlJcAAAAJ&hl=en"
 )
@@ -113,6 +114,7 @@ STANDARD_SHELL_PATHS = (
     "index.html",
     "news/index.html",
     "project/index.html",
+    "publication/index.html",
 )
 REMOVED_PATHS = (
     "publication/index.xml",
@@ -737,6 +739,18 @@ class HomepageContentTests(unittest.TestCase):
             hashlib.sha256(canonical_publications).hexdigest(),
         )
 
+    def test_more_publications_link_targets_curated_archive(self):
+        publications = section(self.homepage, "publications")
+        links = re.findall(
+            r'<a\b[^>]*href="([^"]+)"[^>]*>\s*More Publications\s*</a>',
+            publications,
+            flags=re.DOTALL,
+        )
+        self.assertEqual(
+            [PUBLICATION_ARCHIVE_URL],
+            [html.unescape(link) for link in links],
+        )
+
     def test_project_body_and_image_assets_are_preserved(self):
         project = read_text(ROOT / "project" / "index.html")
         summaries = re.findall(
@@ -819,50 +833,6 @@ class HomepageContentTests(unittest.TestCase):
                     page[:body_end].rstrip().endswith(CLOUDFLARE_BEACON)
                 )
 
-    def test_publication_index_redirects_to_homepage_publications(self):
-        redirect = read_text(ROOT / "publication" / "index.html")
-        canonical = re.findall(
-            r'<link\s+rel="canonical"\s+href="([^"]+)"\s*/?>', redirect
-        )
-        refresh = re.findall(
-            r'<meta\s+http-equiv="refresh"\s+content="\s*0\s*;\s*url=([^"]+)"\s*/?>',
-            redirect,
-            flags=re.IGNORECASE,
-        )
-        fallback = tuple(
-            (attributes, body)
-            for attributes, body in re.findall(
-                r"<a\b([^>]*)>(.*?)</a>", redirect, flags=re.DOTALL | re.IGNORECASE
-            )
-            if re.search(
-                rf'href=["\']{re.escape(PUBLICATIONS_URL)}["\']',
-                attributes,
-                flags=re.IGNORECASE,
-            )
-        )
-        self.assertEqual([PUBLICATIONS_URL], canonical)
-        self.assertEqual([PUBLICATIONS_URL], refresh)
-        self.assertEqual(1, len(fallback))
-        fallback_attributes, fallback_body = fallback[0]
-        self.assertTrue(normalized_rendered_text(fallback_body))
-        self.assertNotRegex(
-            fallback_attributes,
-            re.compile(r"(?:^|\s)hidden(?:\s|=|$)", re.IGNORECASE),
-        )
-        self.assertNotRegex(
-            fallback_attributes,
-            re.compile(r"aria-hidden\s*=\s*[\"']?true", re.IGNORECASE),
-        )
-        self.assertNotRegex(
-            fallback_attributes,
-            re.compile(
-                r"style\s*=\s*[\"'][^\"']*(?:display\s*:\s*none|visibility\s*:\s*hidden)",
-                re.IGNORECASE,
-            ),
-        )
-        self.assertEqual(1, redirect.count(CLOUDFLARE_BEACON))
-        self.assertNotRegex(redirect, r"/publication/[^\"#]+/")
-
     def test_legacy_generated_archives_and_citation_are_absent(self):
         for relative_path in REMOVED_PATHS:
             with self.subTest(path=relative_path):
@@ -905,6 +875,7 @@ class HomepageContentTests(unittest.TestCase):
                 SITE_BASE_URL,
                 SITE_BASE_URL + "news/",
                 SITE_BASE_URL + "project/",
+                PUBLICATION_ARCHIVE_URL,
             ),
             locations,
         )
