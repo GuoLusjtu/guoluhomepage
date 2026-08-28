@@ -70,9 +70,9 @@ Publications appear in reverse chronological order from 2026 to the earliest ret
 
 ## Publication Entry
 
-Every paper uses a compact two-line presentation:
+Every paper uses a compact two-block presentation; either block may wrap naturally onto additional rendered lines:
 
-1. linked paper title;
+1. paper title, linked when a verified destination exists;
 2. authors followed by venue abbreviation and publication year.
 
 Example:
@@ -121,7 +121,7 @@ Implementation verification will cover:
 - `/publication/` no longer redirects to the homepage;
 - all retained entries have a title, authors, venue, and year;
 - Guo Lu is underlined and appears once per author list;
-- title URLs are absolute and use `https://`;
+- when a title URL is present, it is absolute and uses `https://`;
 - excluded record types and duplicate titles are absent;
 - year groups are in reverse chronological order;
 - desktop and mobile layouts wrap without horizontal overflow;
