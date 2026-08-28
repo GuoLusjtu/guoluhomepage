@@ -125,7 +125,7 @@ REMOVED_PATHS = (
     "files/citations/infocom18.bib",
 )
 PUBLICATIONS_SECTION_CANONICAL_SHA256 = (
-    "314e0166b3f37f1212d82b8fa7041fa4b1b1fdde23d86e4a7035a4996b11d5d0"
+    "44e2e06beaab0250a9abdc439f59cd37568e48052ad395ca484d46247d4492fd"
 )
 PROJECT_TITLES = (
     "Learning to Cooperate",
@@ -722,8 +722,9 @@ class HomepageContentTests(unittest.TestCase):
         self.assertIn("&copy; 2020–2026 Guo Lu", self.homepage)
         self.assertNotIn("&copy; 2020 Guo Lu", self.homepage)
 
-    def test_homepage_publications_section_is_byte_for_byte_unchanged(self):
+    def test_homepage_publications_section_is_unchanged_across_platform_line_endings(self):
         publications = raw_section(HOMEPAGE.read_bytes(), "publications")
+        publications = publications.replace(b"\r\n", b"\n")
         self.assertEqual(
             PUBLICATIONS_SECTION_CANONICAL_SHA256,
             hashlib.sha256(publications).hexdigest(),

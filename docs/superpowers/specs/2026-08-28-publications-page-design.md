@@ -77,7 +77,7 @@ Every paper uses a compact two-block presentation; either block may wrap natural
 
 Example:
 
-> **DVC: An End-to-End Deep Video Compression Framework**  
+> **DVC: An End-to-End Deep Video Compression Framework**
 > <u>Guo Lu</u>, Wanli Ouyang, Dong Xu, Xiaoyun Zhang, Chunlei Cai, Zhiyong Gao · *CVPR, 2019*
 
 The title uses the same deterministic priority as metadata verification: paper-specific official proceedings page, then publisher/DOI landing page, then official paper PDF, then arXiv for a confirmed accepted paper whose formal page is unavailable. A paper with no verified destination remains unlinked rather than receiving a guessed URL.
