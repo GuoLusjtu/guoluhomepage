@@ -68,7 +68,9 @@ class PublicationsInventoryTests(unittest.TestCase):
         cls.text, cls.rows = load_inventory()
 
     def test_declared_scholar_count_and_summary_match_rows(self):
-        declared = int(re.search(r"^Scholar records: (\d+)  $", self.text, re.M).group(1))
+        scholar_records = re.search(r"^Scholar records: (\d+)$", self.text, re.M)
+        self.assertIsNotNone(scholar_records)
+        declared = int(scholar_records.group(1))
         discovered = sum(row["Scholar title"] not in {"", "—"} for row in self.rows)
         self.assertEqual(declared, discovered)
         counts = {status: sum(row["Status"] == status for row in self.rows) for status in STATUSES}
