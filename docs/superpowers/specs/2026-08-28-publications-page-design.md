@@ -19,18 +19,39 @@ The first version will exclude:
 - tutorials, challenge descriptions, and similar non-paper records;
 - supplementary-material entries and obvious duplicate or malformed Scholar entries.
 
-An accepted paper whose official page is not yet available may be included when its acceptance and bibliographic details are already confirmed. Its title may temporarily link to arXiv.
+A conference item qualifies as a main-track full paper only when the official proceedings table of contents, official conference program, or paper PDF identifies it as a regular/main-conference paper. Items identified as workshop, companion, demo, challenge, tutorial, poster abstract, or short-paper track are excluded. When public metadata does not resolve the category, the item is marked `needs-review` in the inventory and is not rendered until Guo Lu confirms it.
+
+An accepted paper whose official page is not yet available may be included only when supported by a publisher early-access record, an official venue program/accepted-paper list, or acceptance information explicitly supplied by Guo Lu. Its title may temporarily link to arXiv. A Scholar-only claim is not sufficient evidence of acceptance.
+
+## Curated Inventory Gate
+
+Before page markup is generated, implementation will create a reviewable inventory covering every Scholar record and every accepted paper supplied directly by Guo Lu. Each record has these fields:
+
+- exact title;
+- ordered display authors;
+- venue display name and abbreviation;
+- display year;
+- title destination URL;
+- authority URL used to verify the metadata;
+- record type (`journal`, `conference-main`, or `excluded`);
+- inclusion status (`include`, `exclude`, or `needs-review`);
+- exclusion reason, when applicable.
+
+The inventory is the deterministic source for the rendered page and duplicate/exclusion tests. Items marked `needs-review` are presented to Guo Lu as a short exception list and remain off the page until resolved. This inventory review is a data-content checkpoint before visual implementation, because the currently extracted Scholar data contains abbreviated authors, duplicated versions, and ambiguous record types that must not be guessed.
 
 ## Data Sources and Verification
 
 Google Scholar is the discovery inventory, not the authority for author names. Each selected paper will be matched by title against the strongest available source in this order:
 
-1. official publisher or proceedings page, including IEEE Xplore, ACM Digital Library, CVF Open Access, OpenReview, Springer, and AAAI Proceedings;
-2. the official paper PDF;
-3. arXiv, when the formal record is not yet available;
-4. Google Scholar only as a fallback.
+1. the paper-specific official proceedings page when it exposes the paper directly, including CVF Open Access and OpenReview;
+2. the publisher or DOI landing page, including IEEE Xplore, ACM Digital Library, Springer, and AAAI Proceedings;
+3. the official paper PDF;
+4. arXiv, when the formal record is not yet available;
+5. Google Scholar only as a discovery fallback, not as authority for expanding names or confirming acceptance.
 
 Author initials will never be expanded by guessing. If a full name cannot be verified reliably, the source abbreviation will remain until it can be corrected. Titles, author order, venue, year, and destination URL must agree with the selected authoritative source.
+
+For a conference paper, the display year is the official conference edition year. For a journal paper, the display year is the year of the final volume/issue record; an early-access paper without a volume/issue uses the publisher's early-access year until the final record is available. The inventory records the chosen year authority. A preprint year never overrides the formal venue year.
 
 ## Information Architecture
 
@@ -56,7 +77,7 @@ Example:
 > **DVC: An End-to-End Deep Video Compression Framework**  
 > <u>Guo Lu</u>, Wanli Ouyang, Dong Xu, Xiaoyun Zhang, Chunlei Cai, Zhiyong Gao · *CVPR, 2019*
 
-The title links to the official publication or DOI landing page. CVF Open Access and OpenReview are preferred where applicable because they provide stable paper-specific pages. If no reliable formal page exists, an accepted paper may link to arXiv. A paper with no verified destination remains unlinked rather than receiving a guessed URL.
+The title uses the same deterministic priority as metadata verification: paper-specific official proceedings page, then publisher/DOI landing page, then official paper PDF, then arXiv for a confirmed accepted paper whose formal page is unavailable. A paper with no verified destination remains unlinked rather than receiving a guessed URL.
 
 The first version will not add separate PDF, Code, Project, Highlight, or Oral controls. These can be added later without changing the entry structure.
 
@@ -81,7 +102,7 @@ The design stays visually consistent with the existing academic homepage:
 
 The homepage **More Publications** link will change from Google Scholar to `/guoluhomepage/publication/`. The Google Scholar icon and profile link elsewhere on the homepage remain unchanged.
 
-The new page will have a descriptive document title, canonical URL, and existing site metadata conventions. The current homepage SEO title, body copy, layout, and recent-publications selection will not otherwise change.
+The new page document title will be `Publications | Guo Lu (鲁国) | SJTU`, and its canonical URL will be `https://guolusjtu.github.io/guoluhomepage/publication/`. It will follow the site's existing metadata conventions without adding absent Open Graph or Twitter fields. The navigation retains the same destinations and social links as the homepage, with Publications visibly active on the new page. The current homepage SEO title, body copy, layout, and recent-publications selection will not otherwise change.
 
 ## Data Maintenance
 
@@ -95,10 +116,13 @@ Implementation verification will cover:
 - `/publication/` no longer redirects to the homepage;
 - all retained entries have a title, authors, venue, and year;
 - Guo Lu is underlined and appears once per author list;
-- title URLs are syntactically valid and use HTTPS where available;
+- title URLs are absolute and use `https://`;
 - excluded record types and duplicate titles are absent;
 - year groups are in reverse chronological order;
 - desktop and mobile layouts wrap without horizontal overflow;
 - existing homepage content tests continue to pass;
 - the Cloudflare analytics snippet remains present on the new page.
 
+Automated URL checks validate absolute `https://` syntax only and do not make external reachability a test requirement. Link availability is audited manually during inventory preparation because publisher availability and anti-bot behavior are unstable.
+
+Responsive acceptance is checked at a 1280-pixel desktop viewport and a 375-pixel mobile viewport. At both widths, the document must have no horizontal overflow; at 1280 pixels the year occupies the narrow left column, and at 375 pixels the year appears as a compact label above the first entry in its group. The mobile transition uses the site's Bootstrap-compatible breakpoint at `max-width: 767px`.
