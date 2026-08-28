@@ -165,3 +165,20 @@ class PublicationsInventoryTests(unittest.TestCase):
         self.assertEqual("ECCV", row["Venue"])
         self.assertEqual("2022", row["Year"])
         self.assertEqual("include", row["Status"])
+
+    def test_aaai_2025_papers_are_conference_publications(self):
+        titles = {
+            "L3TC: Leveraging RWKV for Learned Lossless Low-Complexity Text Compression",
+            "Controllable Distortion-Perception Tradeoff Through Latent Diffusion for Neural Image Compression",
+        }
+        for title in titles:
+            matches = [
+                row for row in self.rows
+                if normalized_title(row["Canonical title"]) == normalized_title(title)
+            ]
+            self.assertEqual(1, len(matches), title)
+            row = matches[0]
+            self.assertEqual("include", row["Status"], title)
+            self.assertEqual("AAAI", row["Venue"], title)
+            self.assertEqual("2025", row["Year"], title)
+            self.assertEqual("conference-main", row["Type"], title)
