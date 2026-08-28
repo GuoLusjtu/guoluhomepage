@@ -163,6 +163,41 @@ class PublicationsPageTests(unittest.TestCase):
         self.assertEqual(len(ids), len(set(ids)))
         self.assertEqual([f"publication-year-{year}" for year in years], ids)
 
+    def test_tutorial_is_absent_and_archive_counts_are_updated(self):
+        self.assertNotIn(
+            "Learned image and video compression with deep neural networks",
+            self.page,
+        )
+        self.assertEqual(72, len(self.publication_entries()))
+        self.assertEqual(
+            4,
+            len(re.findall(r'<article class="publication-entry"[^>]*data-year="2020"', self.page)),
+        )
+
+    def test_compact_venue_names_are_rendered_once_with_year(self):
+        expected = {
+            "Neural Hamiltonian Deformation Fields for Dynamic Scene Rendering": "SIGGRAPH Asia",
+            "Efficient Video Semantic Transmission Needs Generative Latent Priors": "WCSP",
+            "TVM: A Tile-based Video Management Framework": "PVLDB",
+        }
+        for title, venue in expected.items():
+            article = re.search(
+                rf'<article class="publication-entry" data-title="{re.escape(title)}".*?</article>',
+                self.page,
+                flags=re.DOTALL,
+            )
+            self.assertIsNotNone(article)
+            fragment = article.group(0)
+            self.assertIn(f'data-venue="{venue}"', fragment)
+            year = "2023" if venue == "PVLDB" else "2025"
+            self.assertEqual(1, fragment.count(f'<em>{venue}, {year}</em>'))
+            meta = re.search(
+                r'<div class="publication-meta">(.*?)</div>',
+                fragment,
+                flags=re.DOTALL,
+            ).group(1)
+            self.assertEqual(1, visible_text(meta).count(year))
+
     def test_entries_have_exact_semantic_blocks_and_owner(self):
         entries = self.publication_entries()
         self.assertTrue(entries)

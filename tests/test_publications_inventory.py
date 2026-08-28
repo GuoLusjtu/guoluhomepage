@@ -79,6 +79,30 @@ class PublicationsInventoryTests(unittest.TestCase):
         )
         self.assertIn(expected, self.text)
 
+    def test_learned_compression_tutorial_is_excluded(self):
+        matches = [
+            row for row in self.rows
+            if row["Canonical title"] == "Learned image and video compression with deep neural networks"
+        ]
+        self.assertEqual(1, len(matches))
+        self.assertEqual("excluded", matches[0]["Type"])
+        self.assertEqual("exclude", matches[0]["Status"])
+        self.assertIn("tutorial", matches[0]["Reason"].lower())
+
+    def test_compact_venue_names_are_normalized(self):
+        expected = {
+            "Neural Hamiltonian Deformation Fields for Dynamic Scene Rendering": "SIGGRAPH Asia",
+            "Efficient Video Semantic Transmission Needs Generative Latent Priors": "WCSP",
+            "TVM: A Tile-based Video Management Framework": "PVLDB",
+        }
+        included = {
+            row["Canonical title"]: row["Venue"]
+            for row in self.rows
+            if row["Status"] == "include"
+        }
+        for title, venue in expected.items():
+            self.assertEqual(venue, included[title])
+
     def test_rows_use_valid_schema_and_provenance(self):
         self.assertTrue(self.rows)
         for row in self.rows:
