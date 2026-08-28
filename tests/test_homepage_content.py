@@ -125,7 +125,7 @@ REMOVED_PATHS = (
     "files/citations/infocom18.bib",
 )
 PUBLICATIONS_SECTION_CANONICAL_SHA256 = (
-    "44e2e06beaab0250a9abdc439f59cd37568e48052ad395ca484d46247d4492fd"
+    "7976ceb2e1a12b7af6f4fa25997538f1238a0c081596c9594a8839e5ceadd2ca"
 )
 PROJECT_TITLES = (
     "Learning to Cooperate",
@@ -344,6 +344,11 @@ class HomepageContentTests(unittest.TestCase):
         )
         self.assertLessEqual(canonical.count(linkedin_insertion), 1)
         canonical = canonical.replace(linkedin_insertion, b"")
+        publications_label_insertion = (
+            b"\n                    <p>Selected corresponding-author publications.</p>"
+        )
+        self.assertLessEqual(canonical.count(publications_label_insertion), 1)
+        canonical = canonical.replace(publications_label_insertion, b"")
         self.assertEqual(
             HOMEPAGE_CANONICAL_SHA256,
             hashlib.sha256(canonical).hexdigest(),
@@ -742,6 +747,16 @@ class HomepageContentTests(unittest.TestCase):
             [PUBLICATION_ARCHIVE_URL],
             [html.unescape(link) for link in links],
         )
+
+    def test_recent_publications_has_corresponding_author_label(self):
+        publications = section(self.homepage, "publications")
+        label = "Selected corresponding-author publications."
+        self.assertEqual(1, publications.count(label))
+        heading_position = publications.index("<h1>Recent Publications</h1>")
+        label_position = publications.index(label)
+        more_position = publications.index("More Publications")
+        self.assertLess(heading_position, label_position)
+        self.assertLess(label_position, more_position)
 
     def test_project_body_and_image_assets_are_preserved(self):
         project = read_text(ROOT / "project" / "index.html")
