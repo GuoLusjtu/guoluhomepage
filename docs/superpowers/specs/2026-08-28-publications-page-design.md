@@ -32,7 +32,7 @@ Before page markup is generated, implementation will create a reviewable invento
 - venue display name and abbreviation;
 - display year;
 - title destination URL, nullable when no reliable public destination exists;
-- authority URL used to verify the metadata, nullable only for a record explicitly confirmed by Guo Lu;
+- authority URL used to verify the metadata, nullable for excluded records or records explicitly confirmed by Guo Lu; included non-user-confirmed records require paper-specific authority and year sources;
 - provenance (`official-page`, `publisher`, `official-pdf`, `arxiv`, or `user-confirmed`) and a short note when provenance is `user-confirmed`;
 - record type (`journal`, `conference-main`, or `excluded`);
 - inclusion status (`include`, `exclude`, or `needs-review`);

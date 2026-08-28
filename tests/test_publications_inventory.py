@@ -98,17 +98,28 @@ class PublicationsInventoryTests(unittest.TestCase):
                 self.assertNotIn(row["Reason"], {"", "—"})
             if row["Provenance"] == "user-confirmed":
                 self.assertNotIn(row["Reason"], {"", "—"})
-            else:
+            elif row["Status"] != "exclude":
                 self.assertNotIn(row["Authority"], {"", "—"})
             for field in ("Destination", "Authority"):
                 if row[field] != "—":
                     parsed = urlparse(row[field])
                     self.assertEqual("https", parsed.scheme)
                     self.assertTrue(parsed.netloc)
-            if row["Year authority"] != "user-confirmed":
+            if row["Year authority"] not in {"—", "user-confirmed"}:
                 parsed = urlparse(row["Year authority"])
                 self.assertEqual("https", parsed.scheme)
                 self.assertTrue(parsed.netloc)
+            elif row["Year authority"] == "—":
+                self.assertEqual("exclude", row["Status"])
+
+    def test_inventory_contains_no_bare_root_evidence_urls(self):
+        for row in self.rows:
+            for field in ("Destination", "Authority", "Year authority"):
+                value = row[field]
+                if value in {"—", "user-confirmed"}:
+                    continue
+                parsed = urlparse(value)
+                self.assertNotIn(parsed.path, {"", "/"}, f"{row['Scholar title']}: {field}")
 
     def test_normalized_title_preserves_unicode_alphanumerics(self):
         self.assertEqual("café视频压缩2026", normalized_title("Café：视频压缩 2026"))
