@@ -129,6 +129,23 @@ class PublicationsPageTests(unittest.TestCase):
             ],
         )
 
+    def test_publications_navigation_uses_awards_and_omits_ai_edge(self):
+        navigation = self.page.split(
+            '<ul class="nav navbar-nav navbar-right">', 1
+        )[1].split("</ul>", 1)[0]
+        self.assertIn(
+            '<a href="https://guolusjtu.github.io/guoluhomepage/#awards">Awards</a>',
+            navigation,
+        )
+        self.assertNotIn("AI@edge", navigation)
+        self.assertNotIn("#projects", navigation)
+
+    def test_footer_back_to_top_targets_current_page(self):
+        back_to_top = re.findall(
+            r'<a\s+href="([^"]+)"\s+id="back_to_top">', self.page
+        )
+        self.assertEqual(["#top"], back_to_top)
+
     def test_years_are_unique_and_reverse_chronological(self):
         years = [
             int(value)
