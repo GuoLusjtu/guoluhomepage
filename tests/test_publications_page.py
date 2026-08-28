@@ -220,6 +220,7 @@ class PublicationsPageTests(unittest.TestCase):
         records = re.findall(pattern, self.page)
         literal_article_count = self.page.count('<article class="publication-entry"')
         self.assertEqual(len(approved), literal_article_count)
+        self.assertEqual(literal_article_count, len(self.publication_entries()))
         self.assertEqual(literal_article_count, len(records))
         for title, authors, venue, year, destination in records:
             decoded_title = html.unescape(title)
