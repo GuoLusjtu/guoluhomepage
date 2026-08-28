@@ -767,7 +767,7 @@ table > tbody > tr:hover > th {
     display: grid;
     grid-template-columns: 72px minmax(0, 1fr);
     column-gap: 24px;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
 }
 
 .publications-page .publication-year-items {
@@ -778,15 +778,15 @@ table > tbody > tr:hover > th {
     color: #607d8b;
     font-size: 18px;
     font-weight: 600;
-    line-height: 1.45;
+    line-height: 1.4;
 }
 
 .publications-page .publication-entry {
-    margin-bottom: 24px;
+    margin-bottom: 18px;
 }
 
 .publications-page .publication-title {
-    margin: 0 0 4px;
+    margin: 0 0 3px;
     font-size: 17px;
     font-weight: 600;
     line-height: 1.45;
@@ -812,7 +812,7 @@ table > tbody > tr:hover > th {
 
     .publications-page .publication-year {
         display: block;
-        margin-bottom: 28px;
+        margin-bottom: 26px;
     }
 
     .publications-page .publication-year-label {
