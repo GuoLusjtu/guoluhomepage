@@ -750,3 +750,76 @@ table > tbody > tr:hover > td,
 table > tbody > tr:hover > th {
     background-color: #e5e5e5;
 }
+
+/*************************************************
+ *  Publications archive
+ **************************************************/
+
+.publications-page {
+    padding: 96px 0 48px;
+}
+
+.publications-page .publications-header {
+    margin-bottom: 32px;
+}
+
+.publications-page .publication-year {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    column-gap: 24px;
+    margin-bottom: 32px;
+}
+
+.publications-page .publication-year-items {
+    min-width: 0;
+}
+
+.publications-page .publication-year-label {
+    color: #607d8b;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.publications-page .publication-entry {
+    margin-bottom: 24px;
+}
+
+.publications-page .publication-title {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.publications-page .publication-meta {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.publications-page .publication-owner {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+    .publications-page {
+        padding-top: 72px;
+    }
+
+    .publications-page .publication-year {
+        display: block;
+        margin-bottom: 28px;
+    }
+
+    .publications-page .publication-year-label {
+        margin-bottom: 10px;
+    }
+
+    .publications-page .publication-title {
+        font-size: 16px;
+    }
+}
