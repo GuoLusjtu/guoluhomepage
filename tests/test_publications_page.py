@@ -150,22 +150,27 @@ class PublicationsPageTests(unittest.TestCase):
         )
 
     def test_years_are_unique_and_reverse_chronological(self):
-        years = [
-            int(value)
-            for value in re.findall(
-                r'<section\b[^>]*\bclass="publication-year"[^>]*'
-                r'\bdata-year="(\d{4})"[^>]*>',
-                self.page,
-            )
-        ]
+        groups = re.findall(
+            r'<section class="publication-year" data-year="(\d{4})" '
+            r'aria-labelledby="(publication-year-\d{4})">',
+            self.page,
+        )
+        years = [int(year) for year, _ in groups]
         self.assertTrue(years)
         self.assertEqual(sorted(set(years), reverse=True), years)
+        ids = [label_id for _, label_id in groups]
+        self.assertEqual(len(ids), len(set(ids)))
+        self.assertEqual([f"publication-year-{year}" for year in years], ids)
 
     def test_entries_have_exact_semantic_blocks_and_owner(self):
         entries = self.publication_entries()
         self.assertTrue(entries)
         for entry in entries:
             self.assertEqual(1, entry.count('class="publication-title"'))
+            self.assertEqual(
+                1,
+                len(re.findall(r'<h3\s+class="publication-title">.*?</h3>', entry, re.DOTALL)),
+            )
             self.assertEqual(1, entry.count('class="publication-meta"'))
             owners = re.findall(
                 r'<span\s+class="publication-owner">(.*?)</span>',
@@ -176,19 +181,20 @@ class PublicationsPageTests(unittest.TestCase):
 
     def test_year_group_labels_wrappers_and_entry_metadata_match(self):
         groups = re.findall(
-            r'<section\s+class="publication-year"\s+data-year="(\d{4})">'
+            r'<section class="publication-year" data-year="(\d{4})" '
+            r'aria-labelledby="(publication-year-\d{4})">'
             r'(.*?)</section>',
             self.page,
             flags=re.DOTALL,
         )
         self.assertTrue(groups)
-        for year, body in groups:
+        for year, label_id, body in groups:
             labels = re.findall(
-                r'<div\s+class="publication-year-label">(.*?)</div>',
+                r'<h2 id="([^"]+)" class="publication-year-label">(.*?)</h2>',
                 body,
                 flags=re.DOTALL,
             )
-            self.assertEqual([year], [visible_text(label) for label in labels])
+            self.assertEqual([(label_id, year)], [(value_id, visible_text(label)) for value_id, label in labels])
             self.assertEqual(1, body.count('class="publication-year-items"'))
             metas = re.findall(
                 r'<div\s+class="publication-meta">(.*?)</div>',
@@ -201,7 +207,7 @@ class PublicationsPageTests(unittest.TestCase):
 
     def test_optional_title_links_use_absolute_https(self):
         links = re.findall(
-            r'<h2\s+class="publication-title">\s*<a\s+href="([^"]+)"',
+            r'<h3\s+class="publication-title">\s*<a\s+href="([^"]+)"',
             self.page,
         )
         for href in links:
@@ -264,14 +270,14 @@ class PublicationsPageTests(unittest.TestCase):
         self.assertTrue(records)
         for title, authors, venue, year, destination, body in records:
             title_block = re.findall(
-                r'<h2\s+class="publication-title">(.*?)</h2>',
+                r'<h3\s+class="publication-title">(.*?)</h3>',
                 body,
                 flags=re.DOTALL,
             )
             self.assertEqual(1, len(title_block))
             self.assertEqual(html.unescape(title), inline_visible_text(title_block[0]))
             links = re.findall(
-                r'<h2\s+class="publication-title">\s*<a\s+href="([^"]+)">',
+                r'<h3\s+class="publication-title">\s*<a\s+href="([^"]+)">',
                 body,
             )
             self.assertEqual(
