@@ -2,7 +2,7 @@
 
 ## Scope
 
-- Reduce the bottom margin between entries on the standalone Publications page from `18px` to `12px`.
+- Reduce the bottom margin between entries on the standalone Publications page from `18px` to `8px`.
 - Add the sentence `Selected corresponding-author publications.` directly below the homepage `Recent Publications` heading and above the existing `More Publications` link.
 - Preserve all publication records, layout structure, links, metadata, and other site content.
 

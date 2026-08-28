@@ -114,7 +114,7 @@ class PublicationsPageTests(unittest.TestCase):
     def test_publication_entries_use_compact_spacing(self):
         blocks = css_rule_blocks(self.css, ".publications-page .publication-entry")
         self.assertEqual(1, len(blocks))
-        self.assertEqual("12px", css_declarations(blocks[0]).get("margin-bottom"))
+        self.assertEqual("8px", css_declarations(blocks[0]).get("margin-bottom"))
 
     def test_publications_navigation_is_exactly_active(self):
         active_items = re.findall(

@@ -22,7 +22,7 @@
 
 - [ ] **Step 1: Write failing tests**
 
-Add `test_publication_entries_use_compact_spacing` to assert that `.publications-page .publication-entry` uses `margin-bottom: 12px`. Add `test_recent_publications_has_corresponding_author_label` to assert that `Selected corresponding-author publications.` appears once directly after the `Recent Publications` heading and before `More Publications`.
+Add `test_publication_entries_use_compact_spacing` to assert that `.publications-page .publication-entry` uses `margin-bottom: 8px`. Add `test_recent_publications_has_corresponding_author_label` to assert that `Selected corresponding-author publications.` appears once directly after the `Recent Publications` heading and before `More Publications`.
 
 - [ ] **Step 2: Run focused tests and confirm they fail**
 
@@ -37,7 +37,7 @@ Expected: both fail before implementation.
 
 - [ ] **Step 3: Implement the minimal changes**
 
-Change the standalone-page entry margin from `18px` to `12px`. Add a short paragraph containing the approved sentence below the homepage heading. Update the existing homepage preservation normalization and publications-section canonical hash only for this approved insertion so the preservation tests continue to reject unrelated changes.
+Change the standalone-page entry margin from `18px` to `8px`. Add a short paragraph containing the approved sentence below the homepage heading. Update the existing homepage preservation normalization and publications-section canonical hash only for this approved insertion so the preservation tests continue to reject unrelated changes.
 
 - [ ] **Step 4: Verify**
 
