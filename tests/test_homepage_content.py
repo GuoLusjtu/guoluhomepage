@@ -100,7 +100,7 @@ LINKEDIN_LIST_ITEM = (
     '                            </li>'
 )
 HOMEPAGE_CANONICAL_SHA256 = (
-    "6e292456182a5973e8f52e5dddfb1107ab25ab4c265823f68712fbdeb72370f7"
+    "5a243d74605c307f19f2978c59e52e878d4833913fe0ebd58844a3cd84f122b6"
 )
 RETAINED_HTML_PATHS = (
     "404.html",
@@ -125,13 +125,7 @@ REMOVED_PATHS = (
     "files/citations/infocom18.bib",
 )
 PUBLICATIONS_SECTION_CANONICAL_SHA256 = (
-    "7535987340efe3c0c14e0b2bca12e9205aa452469b70b47637740f8d29adca91"
-)
-OLD_PUBLICATIONS_SCHOLAR_HREF = (
-    b"https://scholar.google.com/citations?user=R9iwlJcAAAAJ&hl=en/"
-)
-CORRECTED_PUBLICATIONS_SCHOLAR_HREF = (
-    b"https://scholar.google.com/citations?user=R9iwlJcAAAAJ&hl=en"
+    "314e0166b3f37f1212d82b8fa7041fa4b1b1fdde23d86e4a7035a4996b11d5d0"
 )
 PROJECT_TITLES = (
     "Learning to Cooperate",
@@ -336,7 +330,7 @@ class HomepageContentTests(unittest.TestCase):
             LINKEDIN_LIST_ITEM,
         )
 
-    def test_homepage_is_byte_for_byte_unchanged_except_approved_title_and_linkedin(self):
+    def test_homepage_is_byte_for_byte_unchanged_except_approved_changes(self):
         homepage = HOMEPAGE.read_bytes().replace(b"\r\n", b"\n")
         canonical = homepage.replace(
             b"<title>GUO LU&#39;s Homepage</title>",
@@ -471,7 +465,7 @@ class HomepageContentTests(unittest.TestCase):
             for href in re.findall(r'<a\b[^>]*\bhref="([^"]+)"', self.homepage)
             if "scholar.google.com/citations?user=R9iwlJcAAAAJ" in html.unescape(href)
         )
-        self.assertEqual((OWNER_SCHOLAR_URL, OWNER_SCHOLAR_URL), owner_scholar_links)
+        self.assertEqual((OWNER_SCHOLAR_URL,), owner_scholar_links)
         self.assertNotIn("hl=en/", self.homepage)
 
     def test_join_us_callout_has_exact_responsive_accessible_css(self):
@@ -730,19 +724,16 @@ class HomepageContentTests(unittest.TestCase):
 
     def test_homepage_publications_section_is_byte_for_byte_unchanged(self):
         publications = raw_section(HOMEPAGE.read_bytes(), "publications")
-        canonical_publications = publications.replace(
-            OLD_PUBLICATIONS_SCHOLAR_HREF,
-            CORRECTED_PUBLICATIONS_SCHOLAR_HREF,
-        )
         self.assertEqual(
             PUBLICATIONS_SECTION_CANONICAL_SHA256,
-            hashlib.sha256(canonical_publications).hexdigest(),
+            hashlib.sha256(publications).hexdigest(),
         )
 
     def test_more_publications_link_targets_curated_archive(self):
         publications = section(self.homepage, "publications")
         links = re.findall(
-            r'<a\b[^>]*href="([^"]+)"[^>]*>\s*More Publications\s*</a>',
+            r'<a\b[^>]*href="([^"]+)"[^>]*>\s*More Publications\s*'
+            r'<i class="fa fa-angle-double-right"></i>\s*</a>',
             publications,
             flags=re.DOTALL,
         )

@@ -104,7 +104,8 @@ class PublicationsPageTests(unittest.TestCase):
             "</section>", 1
         )[0]
         links = re.findall(
-            r'<a\b[^>]*href="([^"]+)"[^>]*>\s*More Publications\s*</a>',
+            r'<a\b[^>]*href="([^"]+)"[^>]*>\s*More Publications\s*'
+            r'<i class="fa fa-angle-double-right"></i>\s*</a>',
             publications,
             flags=re.DOTALL,
         )
