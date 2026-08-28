@@ -144,7 +144,10 @@ class PublicationsPageTests(unittest.TestCase):
         back_to_top = re.findall(
             r'<a\s+href="([^"]+)"\s+id="back_to_top">', self.page
         )
-        self.assertEqual(["#top"], back_to_top)
+        self.assertEqual(
+            ["https://guolusjtu.github.io/guoluhomepage/publication/#top"],
+            back_to_top,
+        )
 
     def test_years_are_unique_and_reverse_chronological(self):
         years = [
