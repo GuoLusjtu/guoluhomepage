@@ -31,13 +31,16 @@ Before page markup is generated, implementation will create a reviewable invento
 - ordered display authors;
 - venue display name and abbreviation;
 - display year;
-- title destination URL;
-- authority URL used to verify the metadata;
+- title destination URL, nullable when no reliable public destination exists;
+- authority URL used to verify the metadata, nullable only for a record explicitly confirmed by Guo Lu;
+- provenance (`official-page`, `publisher`, `official-pdf`, `arxiv`, or `user-confirmed`) and a short note when provenance is `user-confirmed`;
 - record type (`journal`, `conference-main`, or `excluded`);
 - inclusion status (`include`, `exclude`, or `needs-review`);
 - exclusion reason, when applicable.
 
-The inventory is the deterministic source for the rendered page and duplicate/exclusion tests. Items marked `needs-review` are presented to Guo Lu as a short exception list and remain off the page until resolved. This inventory review is a data-content checkpoint before visual implementation, because the currently extracted Scholar data contains abbreviated authors, duplicated versions, and ambiguous record types that must not be guessed.
+The inventory is a committed, review-stage artifact at `docs/publications-inventory.md`. It is the deterministic source during initial page generation and initial duplicate/exclusion tests. Items marked `needs-review` are presented to Guo Lu as a short exception list and remain off the page until resolved. After Guo Lu approves the inventory and the page is generated, the rendered static HTML becomes the long-term publication source of truth; the inventory remains as an audit record and is not loaded at runtime. Future publications are added directly to the static page under the applicable year.
+
+Duplicate matching uses a normalized title key formed by Unicode normalization, lowercasing, removing punctuation, collapsing whitespace, and removing suffixes such as `supplementary material`. A formal publication and its arXiv version share one display entry. Potential matches that remain ambiguous are marked `needs-review` rather than merged automatically.
 
 ## Data Sources and Verification
 
@@ -85,6 +88,8 @@ The first version will not add separate PDF, Code, Project, Highlight, or Oral c
 
 Authors remain in publication order. Verified full English names are preferred over initials. `Guo Lu` is always underlined and remains in its true author position.
 
+Verified name variants that refer to the site owner, including `G. Lu`, `G Lu`, or `Lu Guo`, are normalized to the display form `Guo Lu` before the underline and single-occurrence checks. This normalization occurs only when the authoritative paper metadata or Guo Lu confirms the identity; initials are not assumed to identify Guo Lu merely because they match.
+
 For publications with at most ten authors, all authors are shown. For publications with more than ten authors, the page retains the first four authors, Guo Lu, and the final two authors, inserting an ellipsis at every omitted span. If Guo Lu is already within the first four or final two, the name is not duplicated. The displayed sequence must preserve the original ordering.
 
 ## Responsive and Visual Behavior
@@ -106,7 +111,7 @@ The new page document title will be `Publications | Guo Lu (鲁国) | SJTU`, and
 
 ## Data Maintenance
 
-The publication list will be stored directly in the static page, following the repository's current architecture. New papers can be inserted into the current year group; a new year adds one year group and its entries. Citation counts will not be copied into the page, avoiding frequently stale data.
+After the initial inventory is approved and rendered, the publication list will be stored directly in the static page, following the repository's current architecture. The review inventory is retained only as an audit artifact, not as a second runtime data source. New papers can be inserted into the current year group; a new year adds one year group and its entries. Citation counts will not be copied into the page, avoiding frequently stale data.
 
 ## Validation
 
