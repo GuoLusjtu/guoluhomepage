@@ -28,6 +28,42 @@ def inline_visible_text(fragment):
     return " ".join(html.unescape(re.sub(r"<[^>]+>", "", fragment)).split())
 
 
+def css_rule_blocks(stylesheet, selector):
+    selector_pattern = r"\s+".join(
+        re.escape(component) for component in selector.split()
+    )
+    return re.findall(
+        rf"(?:^|\}})\s*{selector_pattern}\s*\{{([^{{}}]*)\}}",
+        stylesheet,
+        flags=re.MULTILINE,
+    )
+
+
+def css_declarations(block):
+    return {
+        name.lower(): value.strip().lower()
+        for name, value in re.findall(
+            r"(?:^|;)\s*([a-z-]+)\s*:\s*([^;]+?)\s*(?=;|$)",
+            block,
+            flags=re.IGNORECASE,
+        )
+    }
+
+
+def balanced_css_block_after(stylesheet, marker):
+    marker_position = stylesheet.index(marker)
+    opening_brace = stylesheet.index("{", marker_position + len(marker))
+    depth = 0
+    for position in range(opening_brace, len(stylesheet)):
+        if stylesheet[position] == "{":
+            depth += 1
+        elif stylesheet[position] == "}":
+            depth -= 1
+            if depth == 0:
+                return stylesheet[opening_brace + 1 : position]
+    raise AssertionError(f"Unclosed CSS block after {marker!r}")
+
+
 class PublicationsPageTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -181,7 +217,11 @@ class PublicationsPageTests(unittest.TestCase):
             r'data-year="(\d{4})" data-destination="([^"]*)">'
         )
         rendered = {}
-        for title, authors, venue, year, destination in re.findall(pattern, self.page):
+        records = re.findall(pattern, self.page)
+        literal_article_count = self.page.count('<article class="publication-entry"')
+        self.assertEqual(len(approved), literal_article_count)
+        self.assertEqual(literal_article_count, len(records))
+        for title, authors, venue, year, destination in records:
             decoded_title = html.unescape(title)
             rendered[normalized_title(decoded_title)] = {
                 "title": decoded_title,
@@ -229,9 +269,81 @@ class PublicationsPageTests(unittest.TestCase):
             )
 
     def test_responsive_year_layout_contract(self):
-        self.assertIn(".publications-page .publication-year", self.css)
-        self.assertIn(".publications-page .publication-year-label", self.css)
-        self.assertRegex(self.css, r'@media\s*\(max-width:\s*767px\)')
+        year_blocks = css_rule_blocks(self.css, ".publications-page .publication-year")
+        desktop_year_blocks = [
+            block
+            for block in year_blocks
+            if css_declarations(block).get("display") == "grid"
+        ]
+        self.assertEqual(1, len(desktop_year_blocks))
+        year_declarations = css_declarations(desktop_year_blocks[0])
+        self.assertEqual("grid", year_declarations.get("display"))
+        self.assertEqual(
+            "72px minmax(0, 1fr)",
+            year_declarations.get("grid-template-columns"),
+        )
+
+        items_blocks = css_rule_blocks(
+            self.css, ".publications-page .publication-year-items"
+        )
+        self.assertEqual(1, len(items_blocks))
+        self.assertEqual("0", css_declarations(items_blocks[0]).get("min-width"))
+
+        owner_blocks = css_rule_blocks(
+            self.css, ".publications-page .publication-owner"
+        )
+        self.assertEqual(1, len(owner_blocks))
+        self.assertEqual(
+            "underline", css_declarations(owner_blocks[0]).get("text-decoration")
+        )
+
+        for selector in (
+            ".publications-page .publication-title",
+            ".publications-page .publication-meta",
+        ):
+            with self.subTest(selector=selector):
+                blocks = [
+                    block
+                    for block in css_rule_blocks(self.css, selector)
+                    if css_declarations(block).get("overflow-wrap") == "anywhere"
+                ]
+                self.assertEqual(1, len(blocks))
+                self.assertEqual(
+                    "anywhere", css_declarations(blocks[0]).get("overflow-wrap")
+                )
+
+        media_marker = "@media (max-width: 767px)"
+        self.assertIn(media_marker, self.css)
+        mobile_candidates = [
+            balanced_css_block_after(self.css[position:], media_marker)
+            for position in (
+                match.start()
+                for match in re.finditer(re.escape(media_marker), self.css)
+            )
+        ]
+        mobile_candidates = [
+            block
+            for block in mobile_candidates
+            if ".publications-page .publication-year" in block
+        ]
+        self.assertEqual(1, len(mobile_candidates))
+        mobile = mobile_candidates[0]
+        mobile_year_blocks = css_rule_blocks(
+            mobile, ".publications-page .publication-year"
+        )
+        self.assertEqual(1, len(mobile_year_blocks))
+        self.assertEqual(
+            "block", css_declarations(mobile_year_blocks[0]).get("display")
+        )
+        mobile_label_blocks = css_rule_blocks(
+            mobile, ".publications-page .publication-year-label"
+        )
+        self.assertEqual(1, len(mobile_label_blocks))
+        margin_bottom = css_declarations(mobile_label_blocks[0]).get(
+            "margin-bottom"
+        )
+        self.assertIsNotNone(margin_bottom)
+        self.assertNotEqual("0", margin_bottom)
 
     def test_cloudflare_analytics_is_retained(self):
         self.assertEqual(1, self.page.count(CLOUDFLARE_SCRIPT_URL))
