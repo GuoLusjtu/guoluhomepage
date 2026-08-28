@@ -26,6 +26,18 @@ USER_CONFIRMED_RECORDS = {
         "Year": "2026",
     },
 }
+CURATION_EXCLUSIONS = {
+    "DiFace: Cross-Modal Face Recognition through Controlled Diffusion",
+    "Multi-Style Facial Sketch Synthesis through Masked Generative Modeling",
+    "FreeFlow: A Unified Viewpoint on Diffusion Probabilistic Models via Optimal Transport and Fluid Mechanics",
+    "Frame-Level Complexity Control for Practical Encoder x265",
+    "An Efficient and Flexible Complexity Control Method for Versatile Video Coding",
+    "A unified efficient deep image compression framework and its application on human-centric Task",
+    "Video Encoding Enhancement via Content-Aware Spatial and Temporal Super-Resolution",
+    "基于 Transformer 的深度条件视频压缩",
+    "A Transformer based deep conditional video compression",
+    "A novel frame rate up conversion using iterative non-local means interpolation",
+}
 
 
 def normalized_title(value):
@@ -130,3 +142,26 @@ class PublicationsInventoryTests(unittest.TestCase):
             row = matches[0]
             for field, value in expected.items():
                 self.assertEqual(value, row[field])
+
+    def test_guo_lu_curation_exclusions_are_applied(self):
+        for title in CURATION_EXCLUSIONS:
+            matches = [
+                row for row in self.rows
+                if normalized_title(row["Canonical title"]) == normalized_title(title)
+            ]
+            self.assertEqual(1, len(matches), title)
+            self.assertEqual("exclude", matches[0]["Status"], title)
+            self.assertIn("Guo Lu's curation decision", matches[0]["Reason"], title)
+
+    def test_content_adaptive_latents_has_verified_eccv_metadata(self):
+        title = "Content adaptive latents and decoder for neural image compression"
+        matches = [
+            row for row in self.rows
+            if normalized_title(row["Canonical title"]) == normalized_title(title)
+        ]
+        self.assertEqual(1, len(matches))
+        row = matches[0]
+        self.assertEqual("Guanbo Pan, Guo Lu, Zhihao Hu, Dong Xu", row["Display authors"])
+        self.assertEqual("ECCV", row["Venue"])
+        self.assertEqual("2022", row["Year"])
+        self.assertEqual("include", row["Status"])
