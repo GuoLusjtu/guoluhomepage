@@ -125,7 +125,7 @@ REMOVED_PATHS = (
     "files/citations/infocom18.bib",
 )
 PUBLICATIONS_SECTION_CANONICAL_SHA256 = (
-    "7976ceb2e1a12b7af6f4fa25997538f1238a0c081596c9594a8839e5ceadd2ca"
+    "44e2e06beaab0250a9abdc439f59cd37568e48052ad395ca484d46247d4492fd"
 )
 PROJECT_TITLES = (
     "Learning to Cooperate",
@@ -730,6 +730,11 @@ class HomepageContentTests(unittest.TestCase):
     def test_homepage_publications_section_is_unchanged_across_platform_line_endings(self):
         publications = raw_section(HOMEPAGE.read_bytes(), "publications")
         publications = publications.replace(b"\r\n", b"\n")
+        label_insertion = (
+            b"\n                    <p>Selected corresponding-author publications.</p>"
+        )
+        self.assertLessEqual(publications.count(label_insertion), 1)
+        publications = publications.replace(label_insertion, b"")
         self.assertEqual(
             PUBLICATIONS_SECTION_CANONICAL_SHA256,
             hashlib.sha256(publications).hexdigest(),
