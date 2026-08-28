@@ -30,8 +30,8 @@ USER_CONFIRMED_RECORDS = {
 
 def normalized_title(value):
     value = unicodedata.normalize("NFKC", value).lower()
-    value = re.sub(r"supplementary materials?", "", value)
-    return re.sub(r"[^a-z0-9]+", "", value)
+    value = re.sub(r"\s*supplementary materials?\s*$", "", value)
+    return "".join(character for character in value if character.isalnum())
 
 
 def load_inventory():
@@ -57,7 +57,7 @@ class PublicationsInventoryTests(unittest.TestCase):
 
     def test_declared_scholar_count_and_summary_match_rows(self):
         declared = int(re.search(r"^Scholar records: (\d+)  $", self.text, re.M).group(1))
-        discovered = sum(row["Scholar title"] != "—" for row in self.rows)
+        discovered = sum(row["Scholar title"] not in {"", "—"} for row in self.rows)
         self.assertEqual(declared, discovered)
         counts = {status: sum(row["Status"] == status for row in self.rows) for status in STATUSES}
         expected = "Summary: " + "; ".join(
@@ -75,16 +75,19 @@ class PublicationsInventoryTests(unittest.TestCase):
             self.assertGreater(int(row["Original author count"]), 0)
             if row["Status"] == "include":
                 for field in ("Canonical title", "Display authors", "Venue", "Year authority"):
-                    self.assertNotEqual("—", row[field])
-                self.assertEqual(1, row["Display authors"].count("Guo Lu"))
+                    self.assertNotIn(row[field], {"", "—"})
+                authors = [author.strip() for author in row["Display authors"].split(",")]
+                self.assertEqual(1, authors.count("Guo Lu"))
                 if int(row["Original author count"]) > 10:
-                    self.assertIn("…", row["Display authors"])
+                    self.assertIn("…", authors)
+                else:
+                    self.assertNotIn("…", authors)
             if row["Status"] != "include":
-                self.assertNotEqual("—", row["Reason"])
+                self.assertNotIn(row["Reason"], {"", "—"})
             if row["Provenance"] == "user-confirmed":
-                self.assertNotEqual("—", row["Reason"])
+                self.assertNotIn(row["Reason"], {"", "—"})
             else:
-                self.assertNotEqual("—", row["Authority"])
+                self.assertNotIn(row["Authority"], {"", "—"})
             for field in ("Destination", "Authority"):
                 if row[field] != "—":
                     parsed = urlparse(row[field])
@@ -94,6 +97,19 @@ class PublicationsInventoryTests(unittest.TestCase):
                 parsed = urlparse(row["Year authority"])
                 self.assertEqual("https", parsed.scheme)
                 self.assertTrue(parsed.netloc)
+
+    def test_normalized_title_preserves_unicode_alphanumerics(self):
+        self.assertEqual("café视频压缩2026", normalized_title("Café：视频压缩 2026"))
+
+    def test_normalized_title_removes_punctuation_and_terminal_supplementary_suffix(self):
+        self.assertEqual(
+            "diffvftrainingfree",
+            normalized_title("Diff-VF: Training-Free — Supplementary Materials"),
+        )
+        self.assertEqual(
+            "supplementarymaterialanalysis",
+            normalized_title("Supplementary Material Analysis"),
+        )
 
     def test_included_titles_are_unique_after_normalization(self):
         keys = [
