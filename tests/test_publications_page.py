@@ -310,6 +310,18 @@ class PublicationsPageTests(unittest.TestCase):
             year_declarations.get("grid-template-columns"),
         )
 
+        desktop_label_blocks = [
+            block
+            for block in css_rule_blocks(
+                self.css, ".publications-page .publication-year-label"
+            )
+            if css_declarations(block).get("font-size") == "18px"
+        ]
+        self.assertEqual(1, len(desktop_label_blocks))
+        self.assertEqual(
+            "0", css_declarations(desktop_label_blocks[0]).get("margin")
+        )
+
         items_blocks = css_rule_blocks(
             self.css, ".publications-page .publication-year-items"
         )
