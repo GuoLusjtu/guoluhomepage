@@ -29,8 +29,8 @@ Add `test_publication_entries_use_compact_spacing` to assert that `.publications
 Run:
 
 ```powershell
-python -m unittest tests.test_publications_page.PublicationsPageTests.test_publication_entries_use_compact_spacing -v
-python -m unittest tests.test_homepage_content.HomepageContentTests.test_recent_publications_has_corresponding_author_label -v
+& 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m unittest tests.test_publications_page.PublicationsPageTests.test_publication_entries_use_compact_spacing -v
+& 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m unittest tests.test_homepage_content.HomepageContentTests.test_recent_publications_has_corresponding_author_label -v
 ```
 
 Expected: both fail before implementation.
@@ -44,9 +44,9 @@ Change the standalone-page entry margin from `18px` to `12px`. Add a short parag
 Run:
 
 ```powershell
-python -m unittest tests.test_publications_page.PublicationsPageTests.test_publication_entries_use_compact_spacing -v
-python -m unittest tests.test_homepage_content.HomepageContentTests.test_recent_publications_has_corresponding_author_label -v
-python -m unittest discover -s tests -v
+& 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m unittest tests.test_publications_page.PublicationsPageTests.test_publication_entries_use_compact_spacing -v
+& 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m unittest tests.test_homepage_content.HomepageContentTests.test_recent_publications_has_corresponding_author_label -v
+& 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m unittest discover -s tests -v
 git diff --check
 ```
 
