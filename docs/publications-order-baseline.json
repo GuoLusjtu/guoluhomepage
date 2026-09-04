@@ -1,0 +1,92 @@
+{
+  "2026": [
+    "Loss-Resilient Semantic Communication over Packet-Loss Networks at Extreme-Low Bandwidth",
+    "Every Packet Counts: Dispersing Information for Loss-Resilient Learned Image Compression",
+    "Diff-VF: Training-free High-quality Long Video Generation via Diffusion Model",
+    "GVC-RT: Towards Real-Time Generative Video Compression at Ultra-Low Bitrates",
+    "Generative Communications: Overview, Technologies, and Trends",
+    "DiT-JSCC: Rethinking Deep JSCC With Diffusion Transformers and Semantic Representations",
+    "Generative AI Meets 6G and Beyond: Diffusion Models for Semantic Communications",
+    "Content-aware mamba for learned image compression",
+    "Adaptive Learned Image Compression with Graph Neural Networks",
+    "Unified spatiotemporal token compression for video-llms at ultra-low retention",
+    "Next-frame decoding for ultra-low-bitrate image compression with video diffusion priors",
+    "SMC++: Masked Learning of Unsupervised Video Semantic Compression",
+    "Towards Trustworthy Multimodal Moderation via Policy-Aligned Reasoning and Hierarchical Labeling",
+    "Generative Video Communications: Concepts, Key Technologies, and Future Research Trends",
+    "Large language model for lossless image compression with visual prompts"
+  ],
+  "2025": [
+    "H3D-DGS: Exploring Heterogeneous 3D Motion Representation for Deformable 3D Gaussian Splatting",
+    "Neural Hamiltonian Deformation Fields for Dynamic Scene Rendering",
+    "A Multi-Grid Implicit Neural Representation for Multi-View Videos",
+    "Towards a New Paradigm of Visual Signal Compression",
+    "Efficient Video Semantic Transmission Needs Generative Latent Priors",
+    "Knowledge Distillation for Learned Image Compression",
+    "Instance-Adaptive Spatial-Temporal Enhancement for Efficient Video Compression",
+    "Image Quality Assessment: From Human to Machine Preference",
+    "Differentiable VMAF: A trainable metric for optimizing video compression codec",
+    "QaVA: Query-Aware Video Analysis Framework Based on Data Access Pattern",
+    "R-Bench: Are Your Large Multimodal Model Robust to Real-World Corruptions?",
+    "Linear Attention Modeling for Learned Image Compression",
+    "VARFVV: View-Adaptive Real-Time Interactive Free-View Video Streaming With Edge Computing",
+    "Implicit-Explicit Integrated Representations for Multi-View Video Compression",
+    "L3TC: Leveraging RWKV for Learned Lossless Low-Complexity Text Compression",
+    "Controllable Distortion-Perception Tradeoff Through Latent Diffusion for Neural Image Compression",
+    "MISC: Ultra-Low Bitrate Image Semantic Compression Driven by Large Multimodal Model"
+  ],
+  "2024": [
+    "Coarse-to-fine Transformer For Lossless 3D Medical Image Compression",
+    "Efficient Bitrate Ladder Construction for Per-Shot Adaptive Encoding",
+    "AsymLLIC: Asymmetric Lightweight Learned Image Compression",
+    "Rate-aware Compression for NeRF-based Volumetric Video",
+    "Free-VSC: Free Semantics from Visual Foundation Models for Unsupervised Video Semantic Compression",
+    "Long-Term and Short-Term Information Propagation and Fusion for Learned Video Compression",
+    "Preprocessing Enhanced Image Compression for Machine Vision",
+    "Efficient Dynamic-NeRF Based Volumetric Video Coding with Rate Distortion Optimization",
+    "Task-Aware Encoder Control for Deep Video Compression",
+    "Neural rate control for learned video compression",
+    "A Character Position-Aware Compression Framework for Screen Text Image",
+    "GaussianImage: 1000 FPS Image Representation and Compression by 2D Gaussian Splatting",
+    "A Coding Framework and Benchmark Towards Low-Bitrate Video Understanding"
+  ],
+  "2023": [
+    "High-Fidelity Free-View Talking Head Synthesis for Low-Bandwidth Video Conference",
+    "TVM: A Tile-based Video Management Framework",
+    "Non-Semantics Suppressed Mask Learning for Unsupervised Video Semantic Compression",
+    "CBANet: Toward Complexity and Bitrate Adaptive Deep Image Compression Using a Single Network"
+  ],
+  "2022": [
+    "Perceptual Video Coding Based on Semantic-Guided Texture Detection and Synthesis",
+    "Position-based Motion Vector Prediction for Textual Image Coding",
+    "Content adaptive latents and decoder for neural image compression",
+    "FVC: An End-to-End Framework towards Deep Video Compression in Feature Space",
+    "LSVC: A Learning-based Stereo Video Compression Framework",
+    "Learning based Multi-modality Image and Video Compression",
+    "Coarse-To-Fine Deep Video Coding with Hyperprior-Guided Mode Prediction",
+    "TSA-SCC: Text Semantic-Aware Screen Content Coding With Ultra Low Bitrate",
+    "Exploiting Intra-Slice and Inter-Slice Redundancy for Learning-Based Lossless Volumetric Image Compression",
+    "Spatial Temporal Video Enhancement Using Alternating Exposures"
+  ],
+  "2021": [
+    "Self-Conditioned Probabilistic Learning of Video Rescaling",
+    "FVC: A New Framework towards Deep Video Compression in Feature Space",
+    "VoxelContext-Net: An Octree based Framework for Point Cloud Compression",
+    "An End-to-End Learning Framework for Video Compression"
+  ],
+  "2020": [
+    "Learning 3D Human Shape and Pose from Dense Body Parts",
+    "Improving deep video compression by resolution-adaptive flow coding",
+    "Content adaptive and error propagation aware deep video compression",
+    "Deep Non-Local Kalman Network for Video Compression Artifact Reduction"
+  ],
+  "2019": [
+    "A Novel Deep Progressive Image Compression Framework",
+    "DaNet: Decompose-and-aggregate Network for 3D Human Shape and Pose Estimation",
+    "DVC: An End-To-End Deep Video Compression Framework"
+  ],
+  "2018": [
+    "Deep kalman filtering network for video compression artifact reduction",
+    "Novel Integration of Frame Rate Up Conversion and HEVC Coding Based on Rate-Distortion Optimization"
+  ]
+}

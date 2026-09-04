@@ -1,5 +1,6 @@
 from pathlib import Path
 import html
+import json
 import re
 import unittest
 from urllib.parse import urlparse
@@ -11,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PAGE = ROOT / "publication" / "index.html"
 HOME = ROOT / "index.html"
 CSS = ROOT / "css" / "hugo-academic.css"
+ORDER_BASELINE = ROOT / "docs" / "publications-order-baseline.json"
 PUBLICATIONS_URL = "https://guolusjtu.github.io/guoluhomepage/publication/"
 SCHOLAR_HREF = (
     "https://scholar.google.com/citations?user=R9iwlJcAAAAJ&amp;hl=en"
@@ -18,6 +20,31 @@ SCHOLAR_HREF = (
 EXPECTED_TITLE = "Publications | Guo Lu (鲁国) | SJTU"
 CLOUDFLARE_SCRIPT_URL = "https://static.cloudflareinsights.com/beacon.min.js"
 CLOUDFLARE_TOKEN = "7f0b11c30fc344bfb55c572509aea6d0"
+TYPE_LABELS = {
+    "journal": "Journal Articles",
+    "conference-main": "Conference Papers",
+}
+
+
+def included_inventory_by_title():
+    _, rows = load_inventory()
+    return {
+        normalized_title(row["Canonical title"]): row
+        for row in rows
+        if row["Status"] == "include"
+    }
+
+
+def expected_titles_by_year_and_type():
+    baseline = json.loads(ORDER_BASELINE.read_text(encoding="utf-8"))
+    inventory = included_inventory_by_title()
+    expected = {}
+    for year, titles in baseline.items():
+        expected[year] = {record_type: [] for record_type in TYPE_LABELS}
+        for title in titles:
+            row = inventory[normalized_title(title)]
+            expected[year][row["Type"]].append(title)
+    return expected
 
 
 def visible_text(fragment):
@@ -78,6 +105,93 @@ class PublicationsPageTests(unittest.TestCase):
             self.page,
             flags=re.DOTALL,
         )
+
+    def publication_years(self):
+        starts = list(re.finditer(
+            r'<section class="publication-year" data-year="(\d{4})" '
+            r'aria-labelledby="publication-year-\d{4}">',
+            self.page,
+        ))
+        page_end = self.page.index("</div></main>", starts[-1].end())
+        return [
+            (
+                match.group(1),
+                self.page[
+                    match.end():
+                    starts[index + 1].start() if index + 1 < len(starts) else page_end
+                ],
+            )
+            for index, match in enumerate(starts)
+        ]
+
+    @staticmethod
+    def publication_type_groups(year_body):
+        starts = list(re.finditer(
+            r'<section class="publication-type-group" data-publication-type="([^"]+)" '
+            r'aria-labelledby="([^"]+)">',
+            year_body,
+        ))
+        return [
+            (
+                match.group(1),
+                match.group(2),
+                year_body[
+                    match.end():
+                    starts[index + 1].start() if index + 1 < len(starts) else len(year_body)
+                ],
+            )
+            for index, match in enumerate(starts)
+        ]
+
+    def test_order_baseline_exactly_matches_included_inventory(self):
+        baseline = json.loads(ORDER_BASELINE.read_text(encoding="utf-8"))
+        baseline_titles = [title for titles in baseline.values() for title in titles]
+        baseline_keys = [normalized_title(title) for title in baseline_titles]
+        inventory_keys = list(included_inventory_by_title())
+        self.assertEqual(72, len(baseline_titles))
+        self.assertEqual(len(baseline_keys), len(set(baseline_keys)))
+        self.assertEqual(set(inventory_keys), set(baseline_keys))
+
+    def test_each_year_has_only_nonempty_inventory_authorized_subgroups(self):
+        expected = expected_titles_by_year_and_type()
+        years = dict(self.publication_years())
+        self.assertEqual(set(expected), set(years))
+        for year, expected_types in expected.items():
+            groups = self.publication_type_groups(years[year])
+            actual_types = [record_type for record_type, _, _ in groups]
+            wanted_types = [
+                record_type for record_type in TYPE_LABELS
+                if expected_types[record_type]
+            ]
+            self.assertEqual(wanted_types, actual_types, year)
+            for record_type, label_id, body in groups:
+                expected_id = f"publication-year-{year}-{record_type}"
+                labels = re.findall(
+                    r'<h3 id="([^"]+)" class="publication-type-label">(.*?)</h3>',
+                    body,
+                    flags=re.DOTALL,
+                )
+                self.assertEqual(
+                    [(expected_id, TYPE_LABELS[record_type])],
+                    [(item_id, visible_text(label)) for item_id, label in labels],
+                )
+                self.assertEqual(expected_id, label_id)
+
+    def test_subgroups_preserve_baseline_relative_order_and_classification(self):
+        expected = expected_titles_by_year_and_type()
+        rendered_titles = []
+        for year, year_body in self.publication_years():
+            for record_type, _, body in self.publication_type_groups(year_body):
+                titles = [
+                    html.unescape(title) for title in re.findall(
+                        r'<article class="publication-entry" data-title="([^"]+)"',
+                        body,
+                    )
+                ]
+                self.assertEqual(expected[year][record_type], titles)
+                rendered_titles.extend(titles)
+        self.assertEqual(72, len(rendered_titles))
+        self.assertEqual(72, len({normalized_title(title) for title in rendered_titles}))
 
     def test_page_has_exact_metadata_and_no_redirect(self):
         self.assertEqual(
@@ -210,7 +324,7 @@ class PublicationsPageTests(unittest.TestCase):
             self.assertEqual(1, entry.count('class="publication-title"'))
             self.assertEqual(
                 1,
-                len(re.findall(r'<h3\s+class="publication-title">.*?</h3>', entry, re.DOTALL)),
+                len(re.findall(r'<h4\s+class="publication-title">.*?</h4>', entry, re.DOTALL)),
             )
             self.assertEqual(1, entry.count('class="publication-meta"'))
             owners = re.findall(
@@ -248,7 +362,7 @@ class PublicationsPageTests(unittest.TestCase):
 
     def test_optional_title_links_use_absolute_https(self):
         links = re.findall(
-            r'<h3\s+class="publication-title">\s*<a\s+href="([^"]+)"',
+            r'<h4\s+class="publication-title">\s*<a\s+href="([^"]+)"',
             self.page,
         )
         for href in links:
@@ -311,14 +425,14 @@ class PublicationsPageTests(unittest.TestCase):
         self.assertTrue(records)
         for title, authors, venue, year, destination, body in records:
             title_block = re.findall(
-                r'<h3\s+class="publication-title">(.*?)</h3>',
+                r'<h4\s+class="publication-title">(.*?)</h4>',
                 body,
                 flags=re.DOTALL,
             )
             self.assertEqual(1, len(title_block))
             self.assertEqual(html.unescape(title), inline_visible_text(title_block[0]))
             links = re.findall(
-                r'<h3\s+class="publication-title">\s*<a\s+href="([^"]+)">',
+                r'<h4\s+class="publication-title">\s*<a\s+href="([^"]+)">',
                 body,
             )
             self.assertEqual(
