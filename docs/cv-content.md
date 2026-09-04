@@ -13,9 +13,7 @@ LinkedIn: https://www.linkedin.com/in/guo-lu-118a6592/[^F03]
 
 ## Research Interests
 
-- Video coding and processing.[^F04]
-- Efficient multimodal large language models.[^F04]
-- Multimedia communications.[^F04]
+- Video coding, multimedia processing, and efficient multimodal large language models.[^F04]
 
 ## Academic Appointments
 
@@ -78,7 +76,6 @@ LinkedIn: https://www.linkedin.com/in/guo-lu-118a6592/[^F03]
 - Associate Editor, IEEE Transactions on Circuits and Systems for Video Technology, 2025.[^F22]
 - Guest Editor, IEEE JETCAS Special Issue on “When Large Models Meet Video Coding: Synergies, Systems, and Hardware Challenges,” 2026.[^F23]
 - IEEE VSPC-TC Member, 2025.[^F24]
-- Technical Program Co-Chair, ICASSP Satellite Event, Suzhou, China, 2025.[^F25]
 - Area Chair, ICLR, 2025 and 2026.[^F26]
 - Area Chair, NeurIPS, 2025 and 2026.[^F27]
 - Senior Program Committee Member, AAAI, 2021 and 2026.[^F28]
@@ -106,7 +103,7 @@ LinkedIn: https://www.linkedin.com/in/guo-lu-118a6592/[^F03]
 | F01 | Profile; Academic Appointments | SJTU tenure-track Associate Professor and Ph.D. supervisor | index.html (About Me) |
 | F02 | Profile | Public email and office address | index.html (Contact) |
 | F03 | Profile | Homepage, Google Scholar, GitHub, and LinkedIn links | index.html (profile links) |
-| F04 | Research Interests | Video coding and processing, efficient multimodal large language models, and multimedia communications | index.html (About Me) |
+| F04 | Research Interests | Video coding, multimedia processing, and efficient multimodal large language models | index.html (About Me) |
 | F05 | Academic Appointments | Assistant Professor at Beijing Institute of Technology, 2020–2022 | index.html (About Me) |
 | F06 | Academic Appointments | Visiting Researcher at the University of Sydney, September 2017–March 2019 | index.html (About Me) |
 | F07 | Education | Ph.D. in Electronic Engineering from SJTU, 2020 | index.html (About Me) |
@@ -127,7 +124,6 @@ LinkedIn: https://www.linkedin.com/in/guo-lu-118a6592/[^F03]
 | F22 | Professional Services | IEEE T-CSVT Associate Editor, 2025 | index.html (Services) |
 | F23 | Professional Services | IEEE JETCAS Guest Editor, 2026 | index.html (Services) |
 | F24 | Professional Services | IEEE VSPC-TC Member, 2025 | index.html (Services) |
-| F25 | Professional Services | ICASSP Satellite Event Technical Program Chair, 2025 | index.html (Services) |
 | F26 | Professional Services | ICLR Area Chair, 2025 and 2026 | index.html (Services) |
 | F27 | Professional Services | NeurIPS Area Chair, 2025 and 2026 | index.html (Services) |
 | F28 | Professional Services | AAAI Senior PC, 2021 and 2026 | index.html (Services) |
@@ -166,7 +162,6 @@ LinkedIn: https://www.linkedin.com/in/guo-lu-118a6592/[^F03]
 [^F22]: Evidence row F22.
 [^F23]: Evidence row F23.
 [^F24]: Evidence row F24.
-[^F25]: Evidence row F25.
 [^F26]: Evidence row F26.
 [^F27]: Evidence row F27.
 [^F28]: Evidence row F28.

@@ -31,6 +31,21 @@ EXPECTED_TITLES = [
     "DVC: An End-To-End Deep Video Compression Framework",
 ]
 
+GRANT_IDENTIFIER_PATTERN = re.compile(
+    r"\b(?:grant|project)\s*(?:no\.?|number|id)\s*[:#]?\s*[A-Z0-9][A-Z0-9-]{3,}",
+    flags=re.IGNORECASE,
+)
+FUNDING_AMOUNT_PATTERN = re.compile(
+    r"(?:\b(?:CNY|RMB|USD)\b|US\$|[$¥])\s*\d"
+    r"|\b\d+(?:\.\d+)?\s*(?:million|billion|thousand)\s*(?:yuan|CNY|RMB|USD)\b"
+    r"|\d+(?:\.\d+)?\s*万元",
+    flags=re.IGNORECASE,
+)
+CORRESPONDING_AUTHOR_PATTERN = re.compile(
+    r"corresponding[- ]author|Guo Lu\s*(?:\([*†‡#]\)|[*†‡#])|[*†‡]\s*Guo Lu",
+    flags=re.IGNORECASE,
+)
+
 
 def parse_markdown_table(text, heading):
     match = re.search(
@@ -116,6 +131,32 @@ class CvContentTests(unittest.TestCase):
         lowered = self.content.lower()
         for token in forbidden:
             self.assertNotIn(token.lower(), lowered)
+        self.assertIsNone(GRANT_IDENTIFIER_PATTERN.search(self.content))
+        self.assertIsNone(FUNDING_AMOUNT_PATTERN.search(self.content))
+        self.assertIsNone(CORRESPONDING_AUTHOR_PATTERN.search(self.content))
+
+    def test_negative_claim_patterns_cover_common_unsupported_forms(self):
+        for sample in ("Grant No. 62300001", "Project ID ABCD-1234"):
+            self.assertRegex(sample, GRANT_IDENTIFIER_PATTERN)
+        for sample in ("RMB 500000", "US$250000", "2.5 million yuan", "30万元"):
+            self.assertRegex(sample, FUNDING_AMOUNT_PATTERN)
+        for sample in ("Guo Lu*", "Guo Lu (†)", "‡ Guo Lu", "corresponding-author"):
+            self.assertRegex(sample, CORRESPONDING_AUTHOR_PATTERN)
+
+    def test_research_interests_preserve_exact_homepage_wording(self):
+        section = re.search(
+            r"^## Research Interests\s*$\n(.*?)(?=^## )",
+            self.content,
+            flags=re.MULTILINE | re.DOTALL,
+        ).group(1)
+        self.assertIn(
+            "Video coding, multimedia processing, and efficient multimodal large language models.[^F04]",
+            section,
+        )
+        self.assertNotIn("Multimedia communications", section)
+
+    def test_ambiguous_lac_role_is_not_normalized(self):
+        self.assertNotRegex(self.content, r"Technical Program (?:Co-)?Chair")
 
 
 if __name__ == "__main__":
