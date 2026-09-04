@@ -349,6 +349,16 @@ class HomepageContentTests(unittest.TestCase):
         )
         self.assertLessEqual(canonical.count(publications_label_insertion), 1)
         canonical = canonical.replace(publications_label_insertion, b"")
+        oral_label_insertion = (
+            b"Every Packet Counts: Dispersing Information for Loss-Resilient Learned "
+            b"Image Compression<span style=\"color:red\"><strong>(Oral).</strong></span>"
+        )
+        oral_label_baseline = (
+            b"Every Packet Counts: Dispersing Information for Loss-Resilient Learned "
+            b"Image Compression"
+        )
+        self.assertLessEqual(canonical.count(oral_label_insertion), 1)
+        canonical = canonical.replace(oral_label_insertion, oral_label_baseline)
         self.assertEqual(
             HOMEPAGE_CANONICAL_SHA256,
             hashlib.sha256(canonical).hexdigest(),
@@ -549,6 +559,7 @@ class HomepageContentTests(unittest.TestCase):
 
     def test_other_valid_oral_publication_labels_are_preserved(self):
         for title in (
+            "Every Packet Counts: Dispersing Information for Loss-Resilient Learned Image Compression",
             "Knowledge Distillation for Learned Image Compression",
             "Rate-aware Compression for NeRF-based Volumetric Video",
         ):
@@ -735,6 +746,16 @@ class HomepageContentTests(unittest.TestCase):
         )
         self.assertLessEqual(publications.count(label_insertion), 1)
         publications = publications.replace(label_insertion, b"")
+        oral_label_insertion = (
+            b"Every Packet Counts: Dispersing Information for Loss-Resilient Learned "
+            b"Image Compression<span style=\"color:red\"><strong>(Oral).</strong></span>"
+        )
+        oral_label_baseline = (
+            b"Every Packet Counts: Dispersing Information for Loss-Resilient Learned "
+            b"Image Compression"
+        )
+        self.assertLessEqual(publications.count(oral_label_insertion), 1)
+        publications = publications.replace(oral_label_insertion, oral_label_baseline)
         self.assertEqual(
             PUBLICATIONS_SECTION_CANONICAL_SHA256,
             hashlib.sha256(publications).hexdigest(),
