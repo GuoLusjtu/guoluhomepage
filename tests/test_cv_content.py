@@ -32,13 +32,15 @@ EXPECTED_TITLES = [
 ]
 
 GRANT_IDENTIFIER_PATTERN = re.compile(
-    r"\b(?:grant|project)\s*(?:no\.?|number|id)\s*[:#]?\s*[A-Z0-9][A-Z0-9-]{3,}",
+    r"\b(?:grant|project)\s*(?:no\.?|number|id)\s*[:#]?\s*[A-Z0-9][A-Z0-9-]{3,}"
+    r"|\bNSFC\s*(?:no\.?\s*)?[:#]?\s*\d{6,}\b",
     flags=re.IGNORECASE,
 )
 FUNDING_AMOUNT_PATTERN = re.compile(
     r"(?:\b(?:CNY|RMB|USD)\b|US\$|[$¥])\s*\d"
     r"|\b\d+(?:\.\d+)?\s*(?:million|billion|thousand)\s*(?:yuan|CNY|RMB|USD)\b"
-    r"|\d+(?:\.\d+)?\s*万元",
+    r"|\b(?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(?:yuan|CNY|RMB|USD)\b"
+    r"|\d+(?:\.\d+)?\s*万(?:元)?",
     flags=re.IGNORECASE,
 )
 CORRESPONDING_AUTHOR_PATTERN = re.compile(
@@ -112,10 +114,16 @@ class CvContentTests(unittest.TestCase):
             self.assertEqual(source["Type"], publication_type, title)
 
     def test_non_publication_facts_have_compact_provenance(self):
-        fact_ids = set(re.findall(r"\[\^(F\d+)\]", self.content))
-        self.assertGreaterEqual(len(fact_ids), 1)
+        body, separator, evidence_and_definitions = self.content.partition("\n## Evidence\n")
+        self.assertTrue(separator)
+        body_ids = set(re.findall(r"\[\^(F\d+)\]", body))
+        definition_ids = set(
+            re.findall(r"^\[\^(F\d+)\]:", evidence_and_definitions, flags=re.MULTILINE)
+        )
+        self.assertGreaterEqual(len(body_ids), 1)
         evidence_ids = {row[0] for row in self.evidence_rows}
-        self.assertEqual(fact_ids, evidence_ids)
+        self.assertEqual(body_ids, evidence_ids)
+        self.assertEqual(body_ids, definition_ids)
         for row in self.evidence_rows:
             self.assertEqual(4, len(row))
             self.assertRegex(row[0], r"^F\d+$")
@@ -136,12 +144,32 @@ class CvContentTests(unittest.TestCase):
         self.assertIsNone(CORRESPONDING_AUTHOR_PATTERN.search(self.content))
 
     def test_negative_claim_patterns_cover_common_unsupported_forms(self):
-        for sample in ("Grant No. 62300001", "Project ID ABCD-1234"):
+        for sample in (
+            "Grant No. 62300001",
+            "Project ID ABCD-1234",
+            "NSFC No. 62300001",
+            "NSFC 62300001",
+        ):
             self.assertRegex(sample, GRANT_IDENTIFIER_PATTERN)
-        for sample in ("RMB 500000", "US$250000", "2.5 million yuan", "30万元"):
+        for sample in (
+            "RMB 500000",
+            "US$250000",
+            "2.5 million yuan",
+            "30万元",
+            "500000 RMB",
+            "500,000 yuan",
+            "50万",
+        ):
             self.assertRegex(sample, FUNDING_AMOUNT_PATTERN)
         for sample in ("Guo Lu*", "Guo Lu (†)", "‡ Guo Lu", "corresponding-author"):
             self.assertRegex(sample, CORRESPONDING_AUTHOR_PATTERN)
+        for legitimate_date in (
+            "2022–2024",
+            "January 2025–December 2028",
+            "NSFC General Program, January 2025–December 2028",
+        ):
+            self.assertIsNone(GRANT_IDENTIFIER_PATTERN.search(legitimate_date))
+            self.assertIsNone(FUNDING_AMOUNT_PATTERN.search(legitimate_date))
 
     def test_research_interests_preserve_exact_homepage_wording(self):
         section = re.search(
