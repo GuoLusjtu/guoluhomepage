@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import argparse
+import html
 import re
 import zipfile
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -14,6 +17,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.opc.constants import RELATIONSHIP_TYPE as RT
 from docx.shared import Inches, Pt, RGBColor
+from pypdf import PdfReader
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,6 +27,12 @@ DOCX_PATH = ROOT / "files" / "Guo-Lu-CV.docx"
 BLACK = RGBColor(0, 0, 0)
 BLUE_RGB = RGBColor(23, 54, 93)
 FIXED_TIME = (2000, 1, 1, 0, 0, 0)
+PROFILE_LINKS = {
+    "https://guolusjtu.github.io/guoluhomepage/",
+    "https://scholar.google.com/citations?user=R9iwlJcAAAAJ&hl=en",
+    "https://github.com/GuoLusjtu?tab=repositories",
+    "https://www.linkedin.com/in/guo-lu-118a6592/",
+}
 
 
 def section_text(text: str, heading: str) -> str:
@@ -193,6 +203,47 @@ def normalize_docx(path: Path):
     temporary.replace(path)
 
 
+def normalize_visible_text(value: str) -> str:
+    ascii_text = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", " ", ascii_text.lower()).strip()
+
+
+def visible_docx_paragraphs(path: Path) -> list[str]:
+    with zipfile.ZipFile(path) as package:
+        document_xml = package.read("word/document.xml").decode("utf-8")
+    paragraphs = re.findall(r"<w:p\b.*?</w:p>", document_xml, flags=re.DOTALL)
+    visible = []
+    for paragraph in paragraphs:
+        fragments = re.findall(r"<w:t(?:\s[^>]*)?>(.*?)</w:t>", paragraph, flags=re.DOTALL)
+        normalized = normalize_visible_text(
+            html.unescape(re.sub(r"<[^>]+>", "", "".join(fragments)))
+        )
+        if len(normalized) > 20:
+            visible.append(normalized)
+    return visible
+
+
+def verify_rendered_pdf(path: Path):
+    reader = PdfReader(path)
+    if not 4 <= len(reader.pages) <= 6:
+        raise ValueError(f"Expected 4–6 pages, found {len(reader.pages)}")
+    pdf_text = normalize_visible_text(
+        " ".join(page.extract_text() or "" for page in reader.pages)
+    )
+    missing = [item for item in visible_docx_paragraphs(DOCX_PATH) if item not in pdf_text]
+    if missing:
+        raise ValueError(f"Rendered PDF is stale or incomplete: {missing[0]}")
+    uris = []
+    for page in reader.pages:
+        for annotation_ref in page.get("/Annots", []):
+            action = annotation_ref.get_object().get("/A")
+            if action and action.get("/URI"):
+                uris.append(str(action["/URI"]))
+    for url in PROFILE_LINKS:
+        if uris.count(url) != 1:
+            raise ValueError(f"Expected one PDF link for {url}")
+
+
 def build():
     source = CONTENT_PATH.read_text(encoding="utf-8")
     publications = table_rows(source, "Selected Publications")
@@ -300,4 +351,10 @@ def build():
 
 
 if __name__ == "__main__":
-    build()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--verify-pdf", type=Path)
+    arguments = parser.parse_args()
+    if arguments.verify_pdf:
+        verify_rendered_pdf(arguments.verify_pdf)
+    else:
+        build()

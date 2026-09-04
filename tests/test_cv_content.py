@@ -1,6 +1,8 @@
 import hashlib
+import html
 import re
 import unittest
+import unicodedata
 import zipfile
 from pathlib import Path
 
@@ -14,6 +16,7 @@ INVENTORY_PATH = ROOT / "docs" / "publications-inventory.md"
 DOCX_PATH = ROOT / "files" / "Guo-Lu-CV.docx"
 PDF_PATH = ROOT / "files" / "Guo-Lu-CV.pdf"
 LEGACY_PDF_PATH = ROOT / "paper" / "GuoLu.pdf"
+BUILD_WRAPPER_PATH = ROOT / "scripts" / "build_academic_cv.ps1"
 EXPECTED_PROFILE_LINKS = {
     "https://guolusjtu.github.io/guoluhomepage/",
     "https://scholar.google.com/citations?user=R9iwlJcAAAAJ&hl=en",
@@ -207,6 +210,14 @@ class CvContentTests(unittest.TestCase):
         digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
         self.assertEqual(digest(PDF_PATH), digest(LEGACY_PDF_PATH))
 
+    def test_windows_build_wrapper_regenerates_and_publishes_both_pdfs(self):
+        wrapper = BUILD_WRAPPER_PATH.read_text(encoding="utf-8")
+        self.assertIn("build_academic_cv.py", wrapper)
+        self.assertIn("ExportAsFixedFormat", wrapper)
+        self.assertIn("--verify-pdf", wrapper)
+        self.assertIn("files\\Guo-Lu-CV.pdf", wrapper)
+        self.assertIn("paper\\GuoLu.pdf", wrapper)
+
     def test_docx_uses_native_title_headings_hyperlinks_and_page_field(self):
         document = Document(DOCX_PATH)
         self.assertEqual("Title", document.paragraphs[0].style.name)
@@ -256,6 +267,26 @@ class CvContentTests(unittest.TestCase):
         for token in ("TODO", "TBD", "PLACEHOLDER"):
             self.assertNotIn(token, docx_text.upper())
             self.assertNotIn(token, pdf_text.upper())
+
+    def test_pdf_contains_every_visible_docx_paragraph(self):
+        def normalize(value):
+            ascii_text = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
+            return re.sub(r"[^a-z0-9]+", " ", ascii_text.lower()).strip()
+
+        with zipfile.ZipFile(DOCX_PATH) as package:
+            document_xml = package.read("word/document.xml").decode("utf-8")
+        paragraphs = re.findall(r"<w:p\b.*?</w:p>", document_xml, flags=re.DOTALL)
+        visible_paragraphs = []
+        for paragraph in paragraphs:
+            fragments = re.findall(r"<w:t(?:\s[^>]*)?>(.*?)</w:t>", paragraph, flags=re.DOTALL)
+            text = html.unescape(re.sub(r"<[^>]+>", "", "".join(fragments)))
+            normalized = normalize(text)
+            if len(normalized) > 20:
+                visible_paragraphs.append(normalized)
+        pdf_text = normalize(" ".join(page.extract_text() or "" for page in PdfReader(PDF_PATH).pages))
+        self.assertTrue(visible_paragraphs)
+        for paragraph in visible_paragraphs:
+            self.assertIn(paragraph, pdf_text)
 
 
 if __name__ == "__main__":
