@@ -88,6 +88,7 @@ META_DESCRIPTION = (
     "Multimedia Processing, and Efficient Multimodal LLMs"
 )
 LINKEDIN_URL = "https://www.linkedin.com/in/guo-lu-118a6592/"
+CV_URL = SITE_BASE_URL + "files/Guo-Lu-CV.pdf"
 LINKEDIN_LIST_ITEM = (
     '<li>\n'
     f'                                <a href="{LINKEDIN_URL}" '
@@ -293,7 +294,7 @@ class HomepageContentTests(unittest.TestCase):
         self.assertEqual(1, len(social_lists))
         social = social_lists[0]
         items = re.findall(r'<li>(.*?)</li>', social, flags=re.DOTALL)
-        self.assertEqual(4, len(items))
+        self.assertEqual(5, len(items))
 
         labels = []
         for item in items:
@@ -305,7 +306,9 @@ class HomepageContentTests(unittest.TestCase):
                 labels.append("GitHub")
             elif 'aria-label="LinkedIn"' in item:
                 labels.append("LinkedIn")
-        self.assertEqual(["Contact", "Scholar", "GitHub", "LinkedIn"], labels)
+            elif 'aria-label="CV"' in item:
+                labels.append("CV")
+        self.assertEqual(["Contact", "Scholar", "GitHub", "LinkedIn", "CV"], labels)
 
         linkedin_items = re.findall(
             rf'<li>\r?\n(?:(?!</li>).)*?href="{re.escape(LINKEDIN_URL)}"'
@@ -330,6 +333,18 @@ class HomepageContentTests(unittest.TestCase):
             LINKEDIN_LIST_ITEM,
         )
 
+    def test_homepage_has_one_visible_cv_link_to_canonical_pdf(self):
+        cv_links = re.findall(
+            rf'<a\b[^>]*href="{re.escape(CV_URL)}"[^>]*aria-label="CV"[^>]*>',
+            self.homepage,
+        )
+        self.assertEqual(1, len(cv_links))
+        self.assertEqual(1, self.homepage.count(CV_URL))
+        self.assertRegex(
+            self.homepage,
+            rf'href="{re.escape(CV_URL)}"[^>]*aria-label="CV"[\s\S]*?fa-file-pdf-o',
+        )
+
     def test_homepage_is_byte_for_byte_unchanged_except_approved_changes(self):
         homepage = HOMEPAGE.read_bytes().replace(b"\r\n", b"\n")
         canonical = homepage.replace(
@@ -344,6 +359,15 @@ class HomepageContentTests(unittest.TestCase):
         )
         self.assertLessEqual(canonical.count(linkedin_insertion), 1)
         canonical = canonical.replace(linkedin_insertion, b"")
+        cv_insertion = (
+            b"\n\n                            <li>\n"
+            b"                                <a href=\"https://guolusjtu.github.io/guoluhomepage/files/Guo-Lu-CV.pdf\" aria-label=\"CV\">\n\n"
+            b"                                    <i class=\"fa fa-file-pdf-o big-icon\" aria-hidden=\"true\"></i>\n\n"
+            b"                                </a>\n"
+            b"                            </li>"
+        )
+        self.assertLessEqual(canonical.count(cv_insertion), 1)
+        canonical = canonical.replace(cv_insertion, b"")
         publications_label_insertion = (
             b"\n                    <p>Selected corresponding-author publications.</p>"
         )
