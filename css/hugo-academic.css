@@ -774,6 +774,18 @@ table > tbody > tr:hover > th {
     min-width: 0;
 }
 
+.publications-page .publication-type-group + .publication-type-group {
+    margin-top: 20px;
+}
+
+.publications-page .publication-type-label {
+    color: #607d8b;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin: 0 0 8px;
+}
+
 .publications-page .publication-year-label {
     color: #607d8b;
     font-size: 18px;
@@ -818,6 +830,10 @@ table > tbody > tr:hover > th {
 
     .publications-page .publication-year-label {
         margin-bottom: 10px;
+    }
+
+    .publications-page .publication-type-group + .publication-type-group {
+        margin-top: 16px;
     }
 
     .publications-page .publication-title {
