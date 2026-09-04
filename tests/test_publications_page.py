@@ -47,6 +47,25 @@ def expected_titles_by_year_and_type():
     return expected
 
 
+def balanced_section_bodies(fragment, opening_pattern):
+    """Return capture groups and bodies for matching, properly nested sections."""
+    opening = re.compile(opening_pattern)
+    section_tag = re.compile(r"</?section\b[^>]*>")
+    results = []
+    cursor = 0
+    while match := opening.search(fragment, cursor):
+        depth = 0
+        for tag in section_tag.finditer(fragment, match.start()):
+            depth += -1 if tag.group(0).startswith("</") else 1
+            if depth == 0:
+                results.append((*match.groups(), fragment[match.end():tag.start()]))
+                cursor = tag.end()
+                break
+        else:
+            raise AssertionError(f"Unclosed section beginning at offset {match.start()}")
+    return results
+
+
 def visible_text(fragment):
     return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", fragment)).split())
 
@@ -107,50 +126,45 @@ class PublicationsPageTests(unittest.TestCase):
         )
 
     def publication_years(self):
-        starts = list(re.finditer(
+        return balanced_section_bodies(
+            self.page,
             r'<section class="publication-year" data-year="(\d{4})" '
             r'aria-labelledby="publication-year-\d{4}">',
-            self.page,
-        ))
-        page_end = self.page.index("</div></main>", starts[-1].end())
-        return [
-            (
-                match.group(1),
-                self.page[
-                    match.end():
-                    starts[index + 1].start() if index + 1 < len(starts) else page_end
-                ],
-            )
-            for index, match in enumerate(starts)
-        ]
+        )
 
     @staticmethod
     def publication_type_groups(year_body):
-        starts = list(re.finditer(
+        return balanced_section_bodies(
+            year_body,
             r'<section class="publication-type-group" data-publication-type="([^"]+)" '
             r'aria-labelledby="([^"]+)">',
-            year_body,
-        ))
-        return [
-            (
-                match.group(1),
-                match.group(2),
-                year_body[
-                    match.end():
-                    starts[index + 1].start() if index + 1 < len(starts) else len(year_body)
-                ],
-            )
-            for index, match in enumerate(starts)
-        ]
+        )
 
     def test_order_baseline_exactly_matches_included_inventory(self):
         baseline = json.loads(ORDER_BASELINE.read_text(encoding="utf-8"))
         baseline_titles = [title for titles in baseline.values() for title in titles]
         baseline_keys = [normalized_title(title) for title in baseline_titles]
-        inventory_keys = list(included_inventory_by_title())
+        inventory = included_inventory_by_title()
+        inventory_keys = list(inventory)
         self.assertEqual(72, len(baseline_titles))
         self.assertEqual(len(baseline_keys), len(set(baseline_keys)))
         self.assertEqual(set(inventory_keys), set(baseline_keys))
+        for year, titles in baseline.items():
+            for title in titles:
+                self.assertEqual(year, inventory[normalized_title(title)]["Year"], title)
+
+    def test_subgroup_parser_stops_at_each_balanced_section_boundary(self):
+        fragment = (
+            '<section class="publication-type-group" data-publication-type="journal" '
+            'aria-labelledby="journals"><article data-title="Journal"></article></section>'
+            '<section class="publication-type-group" data-publication-type="conference-main" '
+            'aria-labelledby="conferences"><article data-title="Conference"></article></section>'
+        )
+        groups = self.publication_type_groups(fragment)
+        self.assertEqual(["journal", "conference-main"], [group[0] for group in groups])
+        self.assertIn('data-title="Journal"', groups[0][2])
+        self.assertNotIn('data-title="Conference"', groups[0][2])
+        self.assertIn('data-title="Conference"', groups[1][2])
 
     def test_each_year_has_only_nonempty_inventory_authorized_subgroups(self):
         expected = expected_titles_by_year_and_type()
