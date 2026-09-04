@@ -1,11 +1,25 @@
+import hashlib
 import re
 import unittest
+import zipfile
 from pathlib import Path
+
+from docx import Document
+from pypdf import PdfReader
 
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTENT_PATH = ROOT / "docs" / "cv-content.md"
 INVENTORY_PATH = ROOT / "docs" / "publications-inventory.md"
+DOCX_PATH = ROOT / "files" / "Guo-Lu-CV.docx"
+PDF_PATH = ROOT / "files" / "Guo-Lu-CV.pdf"
+LEGACY_PDF_PATH = ROOT / "paper" / "GuoLu.pdf"
+EXPECTED_PROFILE_LINKS = {
+    "https://guolusjtu.github.io/guoluhomepage/",
+    "https://scholar.google.com/citations?user=R9iwlJcAAAAJ&hl=en",
+    "https://github.com/GuoLusjtu?tab=repositories",
+    "https://www.linkedin.com/in/guo-lu-118a6592/",
+}
 
 EXPECTED_TITLES = [
     "Next-frame decoding for ultra-low-bitrate image compression with video diffusion priors",
@@ -185,6 +199,63 @@ class CvContentTests(unittest.TestCase):
 
     def test_ambiguous_lac_role_is_not_normalized(self):
         self.assertNotRegex(self.content, r"Technical Program (?:Co-)?Chair")
+
+    def test_generated_cv_files_exist_and_public_pdfs_are_identical(self):
+        for path in (DOCX_PATH, PDF_PATH, LEGACY_PDF_PATH):
+            self.assertTrue(path.is_file(), path)
+            self.assertGreater(path.stat().st_size, 1000, path)
+        digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+        self.assertEqual(digest(PDF_PATH), digest(LEGACY_PDF_PATH))
+
+    def test_docx_uses_native_title_headings_hyperlinks_and_page_field(self):
+        document = Document(DOCX_PATH)
+        self.assertEqual("Title", document.paragraphs[0].style.name)
+        styles = [p.style.name for p in document.paragraphs]
+        self.assertIn("Heading 1", styles)
+        self.assertIn("Heading 2", styles)
+        with zipfile.ZipFile(DOCX_PATH) as package:
+            document_xml = package.read("word/document.xml").decode("utf-8")
+            footer_xml = "".join(
+                package.read(name).decode("utf-8")
+                for name in package.namelist()
+                if name.startswith("word/footer") and name.endswith(".xml")
+            )
+            rels_xml = package.read("word/_rels/document.xml.rels").decode("utf-8")
+        self.assertIn("PAGE", footer_xml)
+        self.assertIn("w:hyperlink", document_xml)
+        for url in EXPECTED_PROFILE_LINKS:
+            self.assertIn(url.replace("&", "&amp;"), rels_xml)
+
+    def test_pdf_is_four_to_six_pages_searchable_and_has_exact_profile_links(self):
+        reader = PdfReader(PDF_PATH)
+        self.assertGreaterEqual(len(reader.pages), 4)
+        self.assertLessEqual(len(reader.pages), 6)
+        text = "\n".join(page.extract_text() or "" for page in reader.pages)
+        self.assertIn("Guo Lu", text)
+        self.assertIn("Selected Publications", text)
+        self.assertGreater(len(text), 5000)
+        uris = []
+        for page in reader.pages:
+            for annotation_ref in page.get("/Annots", []):
+                annotation = annotation_ref.get_object()
+                action = annotation.get("/A")
+                if action and action.get("/URI"):
+                    uris.append(str(action["/URI"]))
+        for url in EXPECTED_PROFILE_LINKS:
+            self.assertEqual(1, uris.count(url), url)
+
+    def test_generated_cv_contains_each_selected_paper_exactly_once_and_no_placeholders(self):
+        document = Document(DOCX_PATH)
+        docx_text = "\n".join(p.text for p in document.paragraphs)
+        pdf_text = "\n".join(
+            page.extract_text() or "" for page in PdfReader(PDF_PATH).pages
+        )
+        for title in EXPECTED_TITLES:
+            self.assertEqual(1, docx_text.count(title), title)
+            self.assertEqual(1, pdf_text.count(title), title)
+        for token in ("TODO", "TBD", "PLACEHOLDER"):
+            self.assertNotIn(token, docx_text.upper())
+            self.assertNotIn(token, pdf_text.upper())
 
 
 if __name__ == "__main__":
