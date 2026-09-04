@@ -1,7 +1,26 @@
+param(
+    [string]$PythonExecutable
+)
+
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$python = 'C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+if (-not $PythonExecutable) {
+    $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+    if (-not $pythonCommand) {
+        $pythonCommand = Get-Command python3 -ErrorAction SilentlyContinue
+    }
+    if (-not $pythonCommand) {
+        throw 'Python was not found on PATH. Install Python or pass -PythonExecutable with the full executable path.'
+    }
+    $PythonExecutable = $pythonCommand.Source
+}
+
+& $PythonExecutable -c 'import docx, pypdf'
+if ($LASTEXITCODE -ne 0) {
+    throw 'The selected Python must provide python-docx and pypdf. Install those packages or pass -PythonExecutable for an environment that includes them.'
+}
+
 $builder = Join-Path $PSScriptRoot 'build_academic_cv.py'
 $docx = Join-Path $repoRoot 'files\Guo-Lu-CV.docx'
 $canonicalPdf = Join-Path $repoRoot 'files\Guo-Lu-CV.pdf'
@@ -11,7 +30,7 @@ $tempPdf = Join-Path $tempDir 'Guo-Lu-CV.pdf'
 
 New-Item -ItemType Directory -Path $tempDir | Out-Null
 try {
-    & $python $builder
+    & $PythonExecutable $builder
     if ($LASTEXITCODE -ne 0) { throw 'DOCX generation failed.' }
 
     $word = New-Object -ComObject Word.Application
@@ -26,7 +45,7 @@ try {
         [System.Runtime.InteropServices.Marshal]::ReleaseComObject($word) | Out-Null
     }
 
-    & $python $builder --verify-pdf $tempPdf
+    & $PythonExecutable $builder --verify-pdf $tempPdf
     if ($LASTEXITCODE -ne 0) { throw 'Rendered PDF verification failed.' }
 
     New-Item -ItemType Directory -Force -Path (Split-Path $canonicalPdf), (Split-Path $legacyPdf) | Out-Null

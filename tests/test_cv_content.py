@@ -212,6 +212,10 @@ class CvContentTests(unittest.TestCase):
 
     def test_windows_build_wrapper_regenerates_and_publishes_both_pdfs(self):
         wrapper = BUILD_WRAPPER_PATH.read_text(encoding="utf-8")
+        self.assertRegex(wrapper, r"param\s*\(\s*\[string\]\$PythonExecutable")
+        self.assertIn("Get-Command", wrapper)
+        self.assertNotIn("codex-runtimes", wrapper)
+        self.assertIn("python-docx and pypdf", wrapper)
         self.assertIn("build_academic_cv.py", wrapper)
         self.assertIn("ExportAsFixedFormat", wrapper)
         self.assertIn("--verify-pdf", wrapper)
