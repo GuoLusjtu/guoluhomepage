@@ -15,6 +15,11 @@ PROVENANCE = {"official-page", "publisher", "official-pdf", "arxiv", "user-confi
 RECORD_TYPES = {"journal", "conference-main", "excluded"}
 STATUSES = {"include", "exclude", "needs-review"}
 USER_CONFIRMED_RECORDS = {
+    "Compressing 3D Gaussian Splatting via Cross-Representation Priors": {
+        "Display authors": "Yezheng Zhang, Huanxiong Liang, Chuqin Zhou, Guo Lu, Wenjun Zhang",
+        "Venue": "IEEE TIP",
+        "Year": "2026",
+    },
     "Diff-VF: Training-free High-quality Long Video Generation via Diffusion Model": {
         "Display authors": "Haoning Yang, Xinyuan Chen, Yaohui Wang, Guo Lu",
         "Venue": "ACM TOMM",

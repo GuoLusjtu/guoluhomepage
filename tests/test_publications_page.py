@@ -146,7 +146,7 @@ class PublicationsPageTests(unittest.TestCase):
         baseline_keys = [normalized_title(title) for title in baseline_titles]
         inventory = included_inventory_by_title()
         inventory_keys = list(inventory)
-        self.assertEqual(72, len(baseline_titles))
+        self.assertEqual(73, len(baseline_titles))
         self.assertEqual(len(baseline_keys), len(set(baseline_keys)))
         self.assertEqual(set(inventory_keys), set(baseline_keys))
         for year, titles in baseline.items():
@@ -204,8 +204,8 @@ class PublicationsPageTests(unittest.TestCase):
                 ]
                 self.assertEqual(expected[year][record_type], titles)
                 rendered_titles.extend(titles)
-        self.assertEqual(72, len(rendered_titles))
-        self.assertEqual(72, len({normalized_title(title) for title in rendered_titles}))
+        self.assertEqual(73, len(rendered_titles))
+        self.assertEqual(73, len({normalized_title(title) for title in rendered_titles}))
 
     def test_page_has_exact_metadata_and_no_redirect(self):
         self.assertEqual(
@@ -301,7 +301,7 @@ class PublicationsPageTests(unittest.TestCase):
             "Learned image and video compression with deep neural networks",
             self.page,
         )
-        self.assertEqual(72, len(self.publication_entries()))
+        self.assertEqual(73, len(self.publication_entries()))
         self.assertEqual(
             4,
             len(re.findall(r'<article class="publication-entry"[^>]*data-year="2020"', self.page)),

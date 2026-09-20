@@ -6,8 +6,14 @@
     <description>News from Guo Lu's Homepage</description>
     <language>en-us</language>
     <copyright>© 2020–2026 Guo Lu</copyright>
-    <lastBuildDate>Tue, 18 Aug 2026 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 20 Sep 2026 00:00:00 +0800</lastBuildDate>
     <atom:link href="https://guolusjtu.github.io/guoluhomepage/news/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>NSFC Young Scientists Fund-Type B grant</title>
+      <link>https://guolusjtu.github.io/guoluhomepage/news/#2026-09-nsfc-grant</link>
+      <guid isPermaLink="true">https://guolusjtu.github.io/guoluhomepage/news/#2026-09-nsfc-grant</guid>
+      <description>2026.9 Received an NSFC Young Scientists Fund-Type B grant (国家自然科学基金青年科学基金项目（B类）).</description>
+    </item>
     <item>
       <title>ICLR and AAAI service roles</title>
       <link>https://guolusjtu.github.io/guoluhomepage/news/#2026-08-service</link>
