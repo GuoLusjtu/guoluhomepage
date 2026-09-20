@@ -9,15 +9,24 @@ ROOT = Path(__file__).resolve().parents[1]
 TITLE = "Compressing 3D Gaussian Splatting via Cross-Representation Priors"
 AUTHORS = "Yezheng Zhang, Huanxiong Liang, Chuqin Zhou, Guo Lu, Wenjun Zhang"
 GRANT = "2026.9 Received an NSFC Young Scientists Fund-Type B grant (国家自然科学基金青年科学基金项目（B类）)."
-CHINESE_BIO = "鲁国，上海交通大学电子工程系副教授，研究方向为视频编码与多媒体处理。"
+CHINESE_BIO = "鲁国，上海交通大学电子工程系副教授"
 
 
 class SeptemberUpdatesTests(unittest.TestCase):
     def test_short_chinese_identity_is_visible_once_in_about_me(self):
         homepage = (ROOT / "index.html").read_text(encoding="utf-8")
         about = homepage.split('id="about-me-heading"', 1)[1].split('<aside class="join-us-callout"', 1)[0]
-        self.assertIn(f'<p lang="zh-CN">{CHINESE_BIO}</p>', about)
+        self.assertIn(
+            f'<p class="chinese-profile-line" lang="zh-CN">{CHINESE_BIO} &middot; '
+            '<a href="https://icisee.sjtu.edu.cn/jiaoshiml/luguo.html">'
+            '&#20013;&#25991;&#20027;&#39029; &rarr;</a></p>',
+            about,
+        )
         self.assertEqual(1, homepage.count(CHINESE_BIO))
+        join_us = homepage.split('<aside class="join-us-callout"', 1)[1].split('</aside>', 1)[0]
+        self.assertNotIn('jiaoshiml/luguo.html', join_us)
+        stylesheet = (ROOT / "css" / "hugo-academic.css").read_text(encoding="utf-8")
+        self.assertRegex(stylesheet, r"\.chinese-profile-line\s*\{[^}]*font-size:\s*0\.9rem;[^}]*color:")
 
     def test_grant_is_latest_home_news_and_in_archive_feed(self):
         homepage = html.unescape((ROOT / "index.html").read_text(encoding="utf-8"))

@@ -103,7 +103,7 @@ LINKEDIN_LIST_ITEM = (
     '                            </li>'
 )
 HOMEPAGE_CANONICAL_SHA256 = (
-    "26703ba5e044462d53b11ff4769bc3d47bc98033a93f9161c9060c912c0833f4"
+    "416fdbe98b16d32eaadc91b66987250589b71a31e4b51642579b19d30adbaea0"
 )
 RETAINED_HTML_PATHS = (
     "404.html",
@@ -424,9 +424,8 @@ class HomepageContentTests(unittest.TestCase):
             [RECRUITMENT_COPY],
             [normalized_rendered_text(x) for x in paragraphs],
         )
-        self.assertEqual(1, len(links))
-        self.assertEqual(CHINESE_HOMEPAGE_URL, html.unescape(links[0][0]))
-        self.assertEqual("中文主页 →", normalized_rendered_text(links[0][1]))
+        self.assertEqual(0, len(links))
+        self.assertNotIn(CHINESE_HOMEPAGE_URL, callout)
         decoded_bio = html.unescape(bio)
         self.assertEqual(1, decoded_bio.count(CHINESE_HOMEPAGE_URL))
         self.assertEqual(1, decoded_bio.count("中文主页 →"))
@@ -478,7 +477,8 @@ class HomepageContentTests(unittest.TestCase):
             RECRUITMENT_COPY,
             normalized_rendered_text(callout_after_heading.split("</p>", 1)[0]),
         )
-        self.assertIn(f'href="{CHINESE_HOMEPAGE_URL}"', callout.group(0))
+        self.assertNotIn(f'href="{CHINESE_HOMEPAGE_URL}"', callout.group(0))
+        self.assertIn(f'href="{CHINESE_HOMEPAGE_URL}"', description[:callout.start()])
 
         stylesheet = read_text(STYLESHEET)
         heading_blocks = css_rule_blocks(stylesheet, ".about-me-heading")

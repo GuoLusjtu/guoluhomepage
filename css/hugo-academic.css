@@ -656,6 +656,12 @@ nav#navbar-main li {
     font-weight: 600;
 }
 
+.chinese-profile-line {
+    font-size: 0.9rem;
+    color: #66757a;
+    margin-bottom: 0;
+}
+
 /*************************************************
  *  Join Us callout
  **************************************************/
