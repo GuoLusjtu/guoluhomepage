@@ -103,7 +103,7 @@ LINKEDIN_LIST_ITEM = (
     '                            </li>'
 )
 HOMEPAGE_CANONICAL_SHA256 = (
-    "b35679b3c1359e3afa1ef7ad38b2ba92a6bdd0e6d9879a65702d8ddd9ada1ae1"
+    "fd00c6fbc977bf656d86d77c10324332aec12883eaa1e3f7e595ee8a339d6f91"
 )
 RETAINED_HTML_PATHS = (
     "404.html",
