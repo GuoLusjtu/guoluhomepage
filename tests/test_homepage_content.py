@@ -103,7 +103,7 @@ LINKEDIN_LIST_ITEM = (
     '                            </li>'
 )
 HOMEPAGE_CANONICAL_SHA256 = (
-    "d2dd68b8aa3ad9564868f93b503513753d41e01ba93ac1ee482c891ae3c02e2a"
+    "b35679b3c1359e3afa1ef7ad38b2ba92a6bdd0e6d9879a65702d8ddd9ada1ae1"
 )
 RETAINED_HTML_PATHS = (
     "404.html",
@@ -128,7 +128,7 @@ REMOVED_PATHS = (
     "files/citations/infocom18.bib",
 )
 PUBLICATIONS_SECTION_CANONICAL_SHA256 = (
-    "0f3f145a25c4d0528a7020cff40bda45ab06ce9ec2535f38c261b570fa859c51"
+    "04b1055eb72e10a867b8dac8e8624d662d4575e5f9e2e8ac2d9cc67616ef42ef"
 )
 PROJECT_TITLES = (
     "Learning to Cooperate",
@@ -436,7 +436,7 @@ class HomepageContentTests(unittest.TestCase):
     def test_bio_starts_with_exact_about_me_heading_and_preserves_content(self):
         bio = section(self.homepage, "bio")
         description_columns = re.findall(
-            r'<div class="col-xs-12 col-md-8" itemprop="description">(.*)',
+            r'<div class="col-xs-12 col-md-9" itemprop="description">(.*)',
             bio,
             flags=re.DOTALL,
         )

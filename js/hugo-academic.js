@@ -5,6 +5,36 @@
 
 (function($){
 
+  // Measure the closed mobile header, not the expanded navigation menu.
+  function anchorOffset() {
+    var navbar = $('#navbar-main');
+    var height = navbar.outerHeight() || 0;
+    if (navbar.find('.navbar-toggle').is(':visible')) {
+      height = navbar.find('.navbar-header').outerHeight() || height;
+      height += parseFloat(navbar.css('border-top-width')) || 0;
+      height += parseFloat(navbar.css('border-bottom-width')) || 0;
+    }
+    var offset = Math.ceil(height) + 16;
+    document.documentElement.style.setProperty('--homepage-anchor-offset', offset + 'px');
+    return offset;
+  }
+
+  function sectionPosition(hash) {
+    return hash === '#top' ? 0 : Math.max(0, $(hash).offset().top - anchorOffset());
+  }
+
+  function alignCurrentSection() {
+    var hash = window.location.hash;
+    // Restrict alignment to this homepage's section anchors.
+    if ($('#homepage').length && /^#[a-z][a-z0-9-]*$/i.test(hash) && $(hash).length) {
+      $('html, body').stop(true).scrollTop(sectionPosition(hash));
+    }
+  }
+
+  anchorOffset();
+  $(window).on('resize', anchorOffset);
+  $(window).on('hashchange', alignCurrentSection);
+
   /* ---------------------------------------------------------------------------
    * Add smooth scrolling to all links inside the main navbar.
    * --------------------------------------------------------------------------- */
@@ -19,20 +49,14 @@
       // Prevent default click behavior
       event.preventDefault();
 
-      var navbarHeight = $('.navbar-header').innerHeight();
-
-      // Use jQuery's animate() method for smooth page scrolling.
-      // The numerical parameter specifies the time (ms) taken to scroll to the specified hash.
-      $('html, body').animate({
-        scrollTop: $(hash).offset().top - navbarHeight
-      }, 800, function () {
-        // Add hash (#) to URL once finished scrolling to hash position
-        if (hash == "#top"){
-          window.location.hash = ""
-        }else {
-          window.location.hash = hash;
-        }
-      });
+      // Update the URL without triggering a second native jump after animation.
+      var nextHash = hash === '#top' ? '' : hash;
+      if (window.location.hash !== nextHash) {
+        window.history.pushState(null, '', window.location.pathname + window.location.search + nextHash);
+      }
+      $('html, body').stop(true).animate({
+        scrollTop: sectionPosition(hash)
+      }, 800);
     }
   });
 
@@ -43,11 +67,10 @@
   $('#back_to_top').on('click', function(event){
     event.preventDefault();
 
-    $('html, body').animate({
+    window.history.pushState(null, '', window.location.pathname + window.location.search);
+    $('html, body').stop(true).animate({
       'scrollTop': 0
-    }, 800, function(){
-      window.location.hash = ""
-    });
+    }, 800);
   });
 
   /* ---------------------------------------------------------------------------
@@ -98,10 +121,9 @@
     // Enable smooth scrolling with mouse wheel
     smoothScroll(1.3, 220);
 
-    // When accessing homepage from another page and `#top` hash is set, show top of page (no hash).
-    if (window.location.hash == "#top") {
-      window.location.hash = ""
-    }
+    // Image/font loading can change section positions after the first native jump.
+    anchorOffset();
+    alignCurrentSection();
 
   });
 
