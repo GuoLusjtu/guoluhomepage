@@ -154,7 +154,7 @@ padding 110px 0 110px 0
     background-color: rgb(255, 255, 255);
     padding: 30px 0 30px 0;
     /* Also protect direct URLs and native in-page links from the fixed navbar. */
-    scroll-margin-top: var(--homepage-anchor-offset, 87px);
+    scroll-margin-top: var(--homepage-anchor-offset, 95px);
 }
 @media screen and (max-width: 768px) {
     .home-section {

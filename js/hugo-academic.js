@@ -4,127 +4,104 @@
  **************************************************/
 
 (function($){
+  var scroller = $(document.scrollingElement || document.documentElement);
+  var navigationId = 0;
+  var anchoredHash = section(window.location.hash) ? window.location.hash : null;
 
-  // Measure the closed mobile header, not the expanded navigation menu.
+  function section(hash) {
+    if (!/^#[a-z][a-z0-9-]*$/i.test(hash || '')) return null;
+    var target = document.getElementById(hash.slice(1));
+    return target && $('#homepage').length &&
+      (hash === '#top' || $(target).hasClass('home-section')) ? target : null;
+  }
+
   function anchorOffset() {
     var navbar = $('#navbar-main');
     var height = navbar.outerHeight() || 0;
+    // An expanded mobile menu must not become part of the permanent offset.
     if (navbar.find('.navbar-toggle').is(':visible')) {
       height = navbar.find('.navbar-header').outerHeight() || height;
       height += parseFloat(navbar.css('border-top-width')) || 0;
       height += parseFloat(navbar.css('border-bottom-width')) || 0;
     }
-    var offset = Math.ceil(height) + 16;
+    var offset = Math.ceil(height) + 24;
     document.documentElement.style.setProperty('--homepage-anchor-offset', offset + 'px');
     return offset;
   }
 
   function sectionPosition(hash) {
-    return hash === '#top' ? 0 : Math.max(0, $(hash).offset().top - anchorOffset());
+    var target = section(hash);
+    if (!target || hash === '#top') return 0;
+    return Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - anchorOffset());
   }
 
-  function alignCurrentSection() {
-    var hash = window.location.hash;
-    // Restrict alignment to this homepage's section anchors.
-    if ($('#homepage').length && /^#[a-z][a-z0-9-]*$/i.test(hash) && $(hash).length) {
-      $('html, body').stop(true).scrollTop(sectionPosition(hash));
+  function navigate(hash, animate) {
+    if (!section(hash)) return;
+    anchoredHash = hash;
+    var request = ++navigationId;
+    scroller.stop(true);
+
+    function finish() {
+      if (request !== navigationId) return;
+      // Re-measure after animation: fonts, wrapping, or navbar height may have changed.
+      window.scrollTo(0, sectionPosition(hash));
+    }
+
+    function start() {
+      if (request !== navigationId) return;
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (animate && !reduceMotion) {
+        // Animate the browser's actual scrolling element, never both html and body.
+        scroller.animate({scrollTop: sectionPosition(hash)}, 350, finish);
+      } else {
+        finish();
+      }
+    }
+
+    var menu = $('#navbar-main .navbar-collapse.in, #navbar-main .navbar-collapse.collapsing');
+    if (menu.length && $('#navbar-main .navbar-toggle').is(':visible')) {
+      menu.one('hidden.bs.collapse', start).collapse('hide');
+    } else {
+      start();
     }
   }
 
-  anchorOffset();
-  $(window).on('resize', anchorOffset);
-  $(window).on('hashchange', alignCurrentSection);
-
-  /* ---------------------------------------------------------------------------
-   * Add smooth scrolling to all links inside the main navbar.
-   * --------------------------------------------------------------------------- */
+  function realign() {
+    anchorOffset();
+    if (anchoredHash) navigate(anchoredHash, false);
+  }
 
   $('#navbar-main li.nav-item a').on('click', function(event){
-
-    // Store requested URL hash.
-    var hash = this.hash;
-
-    // If we are on the homepage and the navigation bar link is to a homepage section.
-    if( hash && $(hash).length && ($("#homepage").length > 0)){
-      // Prevent default click behavior
-      event.preventDefault();
-
-      // Update the URL without triggering a second native jump after animation.
-      var nextHash = hash === '#top' ? '' : hash;
-      if (window.location.hash !== nextHash) {
-        window.history.pushState(null, '', window.location.pathname + window.location.search + nextHash);
-      }
-      $('html, body').stop(true).animate({
-        scrollTop: sectionPosition(hash)
-      }, 800);
+    if (!section(this.hash)) return;
+    event.preventDefault();
+    var nextHash = this.hash === '#top' ? '' : this.hash;
+    if (window.location.hash !== nextHash) {
+      window.history.pushState(null, '', window.location.pathname + window.location.search + nextHash);
     }
+    navigate(this.hash, true);
   });
-
-  /* ---------------------------------------------------------------------------
-   * Smooth scrolling for Back To Top link.
-   * --------------------------------------------------------------------------- */
 
   $('#back_to_top').on('click', function(event){
     event.preventDefault();
-
     window.history.pushState(null, '', window.location.pathname + window.location.search);
-    $('html, body').stop(true).animate({
-      'scrollTop': 0
-    }, 800);
+    if (section('#top')) navigate('#top', true);
+    else scroller.stop(true).animate({scrollTop: 0}, 350);
   });
 
-  /* ---------------------------------------------------------------------------
-   * Smooth scrolling for mouse wheel.
-   * --------------------------------------------------------------------------- */
-
-  function smoothScroll(scrollTime, scrollDistance){
-
-    if (navigator.userAgent.indexOf('Mac') != -1 || navigator.userAgent.indexOf('Firefox') > -1 || jQuery('body').hasClass('is-horizontal')){
-      return;
-    }
-
-    jQuery(window).on("mousewheel DOMMouseScroll", function(event){
-
-      event.preventDefault();
-
-      var delta = event.originalEvent.wheelDelta/120 || -event.originalEvent.detail/3;
-      var scrollTop = jQuery(window).scrollTop();
-      var finalScroll = scrollTop - parseInt(delta*scrollDistance);
-
-      TweenMax.to(jQuery(window), scrollTime, {
-        scrollTo : { y: finalScroll, autoKill:true },
-        ease: Expo.easeOut,
-        autoKill: true,
-        overwrite: 5
-      });
-
-    });
-
-  }
-
-  /* ---------------------------------------------------------------------------
-   * Hide mobile collapsable menu on clicking a link.
-   * --------------------------------------------------------------------------- */
-
-  $(document).on('click','.navbar-collapse.in',function(e){
-    if( $(e.target).is('a') && $(e.target).attr('class') != 'dropdown-toggle' ){
-      $(this).collapse('hide');
-    }
+  // Leave wheel/touch scrolling to the browser and cancel pending automatic alignment
+  // as soon as the reader scrolls manually, including during an animation.
+  $(window).on('wheel touchstart pointerdown keydown', function(event){
+    if (event.type === 'keydown' && !/^(ArrowUp|ArrowDown|PageUp|PageDown|Home|End| )$/.test(event.key)) return;
+    anchoredHash = null;
+    navigationId++;
+    scroller.stop(true);
   });
 
-  /* ---------------------------------------------------------------------------
-   * On window load.
-   * --------------------------------------------------------------------------- */
-
-  $(window).load(function(){
-
-    // Enable smooth scrolling with mouse wheel
-    smoothScroll(1.3, 220);
-
-    // Image/font loading can change section positions after the first native jump.
-    anchorOffset();
-    alignCurrentSection();
-
+  $(window).on('resize load', realign);
+  $(window).on('popstate hashchange', function(){
+    anchoredHash = section(window.location.hash) ? window.location.hash : null;
+    realign();
   });
-
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(realign);
+  anchorOffset();
 })(jQuery);
