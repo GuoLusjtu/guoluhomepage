@@ -10,6 +10,8 @@ TITLE = "Compressing 3D Gaussian Splatting via Cross-Representation Priors"
 AUTHORS = "Yezheng Zhang, Huanxiong Liang, Chuqin Zhou, Guo Lu, Wenjun Zhang"
 GRANT = "2026.9 Received an NSFC Young Scientists Fund-Type B grant (国家自然科学基金青年科学基金项目（B类）)."
 CHINESE_BIO = "鲁国，上海交通大学电子工程系副教授"
+TCSVT_TITLE = "Dual-Representation Image Compression at Ultra-Low Bitrates via Explicit Semantics and Implicit Textures"
+TCSVT_AUTHORS = "Chuqin Zhou, Xiaoyue Ling, Yunuo Chen, Jincheng Dai, Guo Lu, Wenjun Zhang"
 
 
 class SeptemberUpdatesTests(unittest.TestCase):
@@ -50,6 +52,16 @@ class SeptemberUpdatesTests(unittest.TestCase):
         archive = html.unescape((ROOT / "publication" / "index.html").read_text(encoding="utf-8"))
         self.assertIn(f'data-title="{TITLE}" data-authors="{AUTHORS}" data-venue="IEEE TIP" data-year="2026" data-destination=""', archive)
         self.assertNotIn(TITLE, (ROOT / "news" / "index.html").read_text(encoding="utf-8"))
+
+    def test_new_tcsvt_paper_is_in_recent_and_full_publications_but_not_news(self):
+        homepage = html.unescape((ROOT / "index.html").read_text(encoding="utf-8"))
+        recent = homepage.split('<section id="publications"', 1)[1].split('</section>', 1)[0]
+        self.assertIn(f"[T-CSVT'26] {TCSVT_TITLE}", recent)
+        self.assertIn("Chuqin Zhou, Xiaoyue Ling, Yunuo Chen, Jincheng Dai, <u>Guo Lu</u>, Wenjun Zhang", recent)
+        self.assertIn("IEEE Transactions on Circuits and Systems for Video Technology, 2026.", recent)
+        archive = html.unescape((ROOT / "publication" / "index.html").read_text(encoding="utf-8"))
+        self.assertIn(f'data-title="{TCSVT_TITLE}" data-authors="{TCSVT_AUTHORS}" data-venue="IEEE T-CSVT" data-year="2026" data-destination=""', archive)
+        self.assertNotIn(TCSVT_TITLE, (ROOT / "news" / "index.html").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

@@ -15,6 +15,11 @@ PROVENANCE = {"official-page", "publisher", "official-pdf", "arxiv", "user-confi
 RECORD_TYPES = {"journal", "conference-main", "excluded"}
 STATUSES = {"include", "exclude", "needs-review"}
 USER_CONFIRMED_RECORDS = {
+    "Dual-Representation Image Compression at Ultra-Low Bitrates via Explicit Semantics and Implicit Textures": {
+        "Display authors": "Chuqin Zhou, Xiaoyue Ling, Yunuo Chen, Jincheng Dai, Guo Lu, Wenjun Zhang",
+        "Venue": "IEEE T-CSVT",
+        "Year": "2026",
+    },
     "Compressing 3D Gaussian Splatting via Cross-Representation Priors": {
         "Display authors": "Yezheng Zhang, Huanxiong Liang, Chuqin Zhou, Guo Lu, Wenjun Zhang",
         "Venue": "IEEE TIP",

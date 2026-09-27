@@ -3,10 +3,11 @@
 Retrieved from Google Scholar: 2026-08-28
 Scholar profile: https://scholar.google.com.au/citations?user=R9iwlJcAAAAJ&hl=zh-CN
 Scholar records: 108
-Summary: include=73; exclude=36; needs-review=0
+Summary: include=74; exclude=36; needs-review=0
 
 | Scholar title | Canonical title | Display authors | Original author count | Venue | Year | Destination | Authority | Year authority | Provenance | Type | Status | Reason |
 | --- | --- | --- | ---: | --- | ---: | --- | --- | --- | --- | --- | --- | --- |
+| — | Dual-Representation Image Compression at Ultra-Low Bitrates via Explicit Semantics and Implicit Textures | Chuqin Zhou, Xiaoyue Ling, Yunuo Chen, Jincheng Dai, Guo Lu, Wenjun Zhang | 6 | IEEE T-CSVT | 2026 | — | — | user-confirmed | user-confirmed | journal | include | Guo Lu confirmed the IEEE T-CSVT 2026 acceptance and author order; no formal publication link supplied. |
 | — | Compressing 3D Gaussian Splatting via Cross-Representation Priors | Yezheng Zhang, Huanxiong Liang, Chuqin Zhou, Guo Lu, Wenjun Zhang | 5 | IEEE TIP | 2026 | — | — | user-confirmed | user-confirmed | journal | include | Guo Lu confirmed the IEEE TIP 2026 publication, author order, and corresponding-author role; no formal publication link supplied. |
 | Loss-Resilient Semantic Communication over Packet-Loss Networks at Extreme-Low Bandwidth | Loss-Resilient Semantic Communication over Packet-Loss Networks at Extreme-Low Bandwidth | Shengshi Yao, Jincheng Dai, Sixian Wang, Guo Lu, Kai Niu, Wenjun Xu, Wenjun Zhang, Ping Zhang | 8 | IEEE TMC | 2026 | https://doi.org/10.1109/tmc.2026.3726512 | https://doi.org/10.1109/tmc.2026.3726512 | https://doi.org/10.1109/tmc.2026.3726512 | publisher | journal | include | — |
 | Every Packet Counts: Dispersing Information for Loss-Resilient Learned Image Compression | Every Packet Counts: Dispersing Information for Loss-Resilient Learned Image Compression | Yuhang Wei, Chuqin Zhou, Yibo Shi, Jing Wang, Guo Lu | 5 | ACM MM | 2026 | https://arxiv.org/abs/2608.11096 | — | user-confirmed | user-confirmed | conference-main | include | Guo Lu confirmed the accepted ACM MM 2026 venue and year in this task history. |
