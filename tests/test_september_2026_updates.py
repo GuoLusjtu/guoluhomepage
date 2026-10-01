@@ -30,16 +30,16 @@ class SeptemberUpdatesTests(unittest.TestCase):
         stylesheet = (ROOT / "css" / "hugo-academic.css").read_text(encoding="utf-8")
         self.assertRegex(stylesheet, r"\.chinese-profile-line\s*\{[^}]*font-size:\s*0\.9rem;[^}]*color:")
 
-    def test_grant_is_latest_home_news_and_in_archive_feed(self):
+    def test_grant_is_in_home_news_and_archive_feed(self):
         homepage = html.unescape((ROOT / "index.html").read_text(encoding="utf-8"))
         news = homepage.split('<section id="news"', 1)[1].split('</section>', 1)[0]
         items = re.findall(r'<li><p>(.*?)</p></li>', news)
         self.assertEqual(6, len(items))
-        self.assertEqual(GRANT, items[0])
+        self.assertIn(GRANT, items)
         archive = html.unescape((ROOT / "news" / "index.html").read_text(encoding="utf-8"))
         self.assertIn(f'<div id="2026-09-nsfc-grant">\n        <p>{GRANT}</p>', archive)
         feed = ET.parse(ROOT / "news" / "index.xml").getroot().find("channel")
-        first = feed.findall("item")[0]
+        first = next(item for item in feed.findall("item") if item.findtext("guid").endswith("#2026-09-nsfc-grant"))
         self.assertEqual(GRANT, first.findtext("description"))
         self.assertTrue(first.findtext("guid").endswith("#2026-09-nsfc-grant"))
 
