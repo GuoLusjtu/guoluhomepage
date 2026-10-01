@@ -13,14 +13,17 @@ STYLESHEET = ROOT / "css" / "hugo-academic.css"
 NEWS_ARCHIVE = ROOT / "news" / "index.html"
 NEWS_FEED = ROOT / "news" / "index.xml"
 NEWS_ITEMS = (
+    "2026.9 One Ph.D. student and two master’s students in our group were awarded the National Scholarship. Congratulations!",
     "2026.9 Received an NSFC Young Scientists Fund-Type B grant (国家自然科学基金青年科学基金项目（B类）).",
     "2026.8 Serving as an Area Chair for ICLR and as a Senior PC member for AAAI.",
     "2026.8 Two papers were accepted by ACM TOMM and IEEE T-CSVT.",
     "2026.7 Two papers were accepted by ACM MM 2026, and one paper was accepted by ECCV 2026.",
     "2026.6 Organizing the Challenge on Ultra-Low Bitrate Image Compression at ECCV 2026.",
-    "2026.3 Serving as a Guest Editor for an IEEE JETCAS Special Issue.",
 )
-ARCHIVED_NEWS_ITEMS = NEWS_ITEMS + ("2026.2 Two papers were accepted by CVPR 2026.",)
+ARCHIVED_NEWS_ITEMS = NEWS_ITEMS + (
+    "2026.3 Serving as a Guest Editor for an IEEE JETCAS Special Issue.",
+    "2026.2 Two papers were accepted by CVPR 2026.",
+)
 LEGACY_NEWS_MARKERS = (
     "One paper accepted at ICLR&#39;20",
     "One paper accepted at TON",
@@ -31,17 +34,18 @@ LEGACY_NEWS_MARKERS = (
     "/news/page/2/",
 )
 NEWS_FEED_ITEMS = (
-    ("2026-09-nsfc-grant", "NSFC Young Scientists Fund-Type B grant", ARCHIVED_NEWS_ITEMS[0]),
-    ("2026-08-service", "ICLR and AAAI service roles", ARCHIVED_NEWS_ITEMS[1]),
-    ("2026-08-publications", "Two journal papers accepted", ARCHIVED_NEWS_ITEMS[2]),
+    ("2026-09-national-scholarships", "Three students awarded the National Scholarship", ARCHIVED_NEWS_ITEMS[0]),
+    ("2026-09-nsfc-grant", "NSFC Young Scientists Fund-Type B grant", ARCHIVED_NEWS_ITEMS[1]),
+    ("2026-08-service", "ICLR and AAAI service roles", ARCHIVED_NEWS_ITEMS[2]),
+    ("2026-08-publications", "Two journal papers accepted", ARCHIVED_NEWS_ITEMS[3]),
     (
         "2026-07-publications",
         "ACM MM 2026 and ECCV 2026 papers accepted",
-        ARCHIVED_NEWS_ITEMS[3],
+        ARCHIVED_NEWS_ITEMS[4],
     ),
-    ("2026-06-challenge", "ECCV 2026 compression challenge", ARCHIVED_NEWS_ITEMS[4]),
-    ("2026-03-jetcas", "IEEE JETCAS Special Issue Guest Editor", ARCHIVED_NEWS_ITEMS[5]),
-    ("2026-02-cvpr", "Two CVPR 2026 papers accepted", ARCHIVED_NEWS_ITEMS[6]),
+    ("2026-06-challenge", "ECCV 2026 compression challenge", ARCHIVED_NEWS_ITEMS[5]),
+    ("2026-03-jetcas", "IEEE JETCAS Special Issue Guest Editor", ARCHIVED_NEWS_ITEMS[6]),
+    ("2026-02-cvpr", "Two CVPR 2026 papers accepted", ARCHIVED_NEWS_ITEMS[7]),
 )
 CLOUDFLARE_TOKEN = "7f0b11c30fc344bfb55c572509aea6d0"
 CLOUDFLARE_SCRIPT_URL = "https://static.cloudflareinsights.com/beacon.min.js"
@@ -103,7 +107,7 @@ LINKEDIN_LIST_ITEM = (
     '                            </li>'
 )
 HOMEPAGE_CANONICAL_SHA256 = (
-    "fd00c6fbc977bf656d86d77c10324332aec12883eaa1e3f7e595ee8a339d6f91"
+    "27c73a5c4de6e94cebc59efcf896097a9fbcbce20cb4301806a1069f3acdfeb8"
 )
 RETAINED_HTML_PATHS = (
     "404.html",
@@ -1071,7 +1075,7 @@ class HomepageContentTests(unittest.TestCase):
             ("description", "News from Guo Lu's Homepage"),
             ("language", "en-us"),
             ("copyright", "© 2020–2026 Guo Lu"),
-            ("lastBuildDate", "Sun, 20 Sep 2026 00:00:00 +0800"),
+            ("lastBuildDate", "Thu, 01 Oct 2026 00:00:00 +0800"),
             (atom_link_tag, None),
         )
         self.assertEqual(
@@ -1094,7 +1098,7 @@ class HomepageContentTests(unittest.TestCase):
             atom_links[0].attrib,
         )
         items = channel.findall("item")
-        self.assertEqual(7, len(items))
+        self.assertEqual(8, len(items))
         for item, (fragment, title, description) in zip(items, NEWS_FEED_ITEMS):
             with self.subTest(fragment=fragment):
                 expected_url = (
