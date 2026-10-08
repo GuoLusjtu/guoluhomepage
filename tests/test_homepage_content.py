@@ -107,7 +107,7 @@ LINKEDIN_LIST_ITEM = (
     '                            </li>'
 )
 HOMEPAGE_CANONICAL_SHA256 = (
-    "27c73a5c4de6e94cebc59efcf896097a9fbcbce20cb4301806a1069f3acdfeb8"
+    "be0976599c349651cf2f8e68e713a4675acd21a70e8c8dc40044aec9017f7f1f"
 )
 RETAINED_HTML_PATHS = (
     "404.html",
@@ -132,7 +132,7 @@ REMOVED_PATHS = (
     "files/citations/infocom18.bib",
 )
 PUBLICATIONS_SECTION_CANONICAL_SHA256 = (
-    "04b1055eb72e10a867b8dac8e8624d662d4575e5f9e2e8ac2d9cc67616ef42ef"
+    "f8bedfb59856322324cfd92e0f37e549f52353a9d4bd51b2fb3ab29bc93e787b"
 )
 PROJECT_TITLES = (
     "Learning to Cooperate",
