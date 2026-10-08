@@ -2,6 +2,7 @@
   "2026": [
     "Dual-Representation Image Compression at Ultra-Low Bitrates via Explicit Semantics and Implicit Textures",
     "Compressing 3D Gaussian Splatting via Cross-Representation Priors",
+    "Free-GVC: Towards Training-Free Extreme Generative Video Compression with Temporal Coherence",
     "Loss-Resilient Semantic Communication over Packet-Loss Networks at Extreme-Low Bandwidth",
     "Every Packet Counts: Dispersing Information for Loss-Resilient Learned Image Compression",
     "Diff-VF: Training-free High-quality Long Video Generation via Diffusion Model",
