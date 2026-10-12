@@ -107,7 +107,7 @@ LINKEDIN_LIST_ITEM = (
     '                            </li>'
 )
 HOMEPAGE_CANONICAL_SHA256 = (
-    "be0976599c349651cf2f8e68e713a4675acd21a70e8c8dc40044aec9017f7f1f"
+    "cbf94604486f3c110ab8905a3566e229a5932e8e900cbfe828d2e778428bb2bc"
 )
 RETAINED_HTML_PATHS = (
     "404.html",
@@ -685,7 +685,7 @@ class HomepageContentTests(unittest.TestCase):
             "Guest Editor, IEEE JETCAS Special Issue on “When Large Models Meet Video Coding: Synergies, Systems, and Hardware Challenges,” 2026.",
             "Challenge Organizer, The Challenge on Ultra-Low Bitrate Image Compression @ ECCV 2026.",
             "Area Chair, International Conference on Learning Representations (ICLR), 2025, 2026.",
-            "Area Chair, Annual Conference on Neural Information Processing Systems (NeurIPS), 2025, 2026.",
+            "Area Chair, Annual Conference on Neural Information Processing Systems (NeurIPS), 2025, 2026 (Top AC in 2026).",
             "Senior PC, AAAI, 2021, 2026.",
         )
         preserved_roles = (
