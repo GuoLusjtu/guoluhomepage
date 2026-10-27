@@ -107,7 +107,7 @@ LINKEDIN_LIST_ITEM = (
     '                            </li>'
 )
 HOMEPAGE_CANONICAL_SHA256 = (
-    "470f85497a31bd0e246ab3215a7694d1fe95aaaa1dde91270f464ff25543be3a"
+    "972a7944f8af10974a8797f3958b51fa7542781589aca22166e48667ca21d7d2"
 )
 RETAINED_HTML_PATHS = (
     "404.html",
@@ -132,7 +132,7 @@ REMOVED_PATHS = (
     "files/citations/infocom18.bib",
 )
 PUBLICATIONS_SECTION_CANONICAL_SHA256 = (
-    "7906f31597b37191b1c0e46e272abc522a963701ebb41a9e5f98067dcbb3e0fa"
+    "41f78a4a108edb75e7d6c7d16daf64ed2d9fc3375e2a102a45204348fb242523"
 )
 PROJECT_TITLES = (
     "Learning to Cooperate",
@@ -601,7 +601,7 @@ class HomepageContentTests(unittest.TestCase):
             (
                 "Diff-VF: Training-free High-quality Long Video Generation via Diffusion Model",
                 "[TOMM'26] Diff-VF: Training-free High-quality Long Video Generation via Diffusion Model",
-                "https://scholar.google.com.au/citations?view_op=view_citation&hl=zh-CN&user=R9iwlJcAAAAJ&sortby=pubdate&citation_for_view=R9iwlJcAAAAJ:4fKUyHm3Qg0C",
+                "https://arxiv.org/abs/2608.05976",
                 "Haoning Yang, Xinyuan Chen, Yaohui Wang, <u>Guo Lu</u>",
                 "ACM Transactions on Multimedia Computing, Communications, and Applications (TOMM), 2026.",
             ),

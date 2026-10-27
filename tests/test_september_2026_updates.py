@@ -50,7 +50,7 @@ class SeptemberUpdatesTests(unittest.TestCase):
         self.assertIn("Yezheng Zhang, Huanxiong Liang, Chuqin Zhou, <u>Guo Lu</u>, Wenjun Zhang", recent)
         self.assertIn("IEEE Transactions on Image Processing, 2026.", recent)
         archive = html.unescape((ROOT / "publication" / "index.html").read_text(encoding="utf-8"))
-        self.assertIn(f'data-title="{TITLE}" data-authors="{AUTHORS}" data-venue="IEEE TIP" data-year="2026" data-destination=""', archive)
+        self.assertIn(f'data-title="{TITLE}" data-authors="{AUTHORS}" data-venue="IEEE TIP" data-year="2026" data-destination="https://arxiv.org/abs/2609.23005"', archive)
         self.assertNotIn(TITLE, (ROOT / "news" / "index.html").read_text(encoding="utf-8"))
 
     def test_new_tcsvt_paper_is_in_recent_and_full_publications_but_not_news(self):
@@ -60,7 +60,7 @@ class SeptemberUpdatesTests(unittest.TestCase):
         self.assertIn("Chuqin Zhou, Xiaoyue Ling, Yunuo Chen, Jincheng Dai, <u>Guo Lu</u>, Wenjun Zhang", recent)
         self.assertIn("IEEE Transactions on Circuits and Systems for Video Technology, 2026.", recent)
         archive = html.unescape((ROOT / "publication" / "index.html").read_text(encoding="utf-8"))
-        self.assertIn(f'data-title="{TCSVT_TITLE}" data-authors="{TCSVT_AUTHORS}" data-venue="IEEE T-CSVT" data-year="2026" data-destination=""', archive)
+        self.assertIn(f'data-title="{TCSVT_TITLE}" data-authors="{TCSVT_AUTHORS}" data-venue="IEEE T-CSVT" data-year="2026" data-destination="https://arxiv.org/abs/2602.05213"', archive)
         self.assertNotIn(TCSVT_TITLE, (ROOT / "news" / "index.html").read_text(encoding="utf-8"))
 
 
