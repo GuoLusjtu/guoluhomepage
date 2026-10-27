@@ -3,10 +3,11 @@
 Retrieved from Google Scholar: 2026-08-28
 Scholar profile: https://scholar.google.com.au/citations?user=R9iwlJcAAAAJ&hl=zh-CN
 Scholar records: 108
-Summary: include=75; exclude=35; needs-review=0
+Summary: include=76; exclude=35; needs-review=0
 
 | Scholar title | Canonical title | Display authors | Original author count | Venue | Year | Destination | Authority | Year authority | Provenance | Type | Status | Reason |
 | --- | --- | --- | ---: | --- | ---: | --- | --- | --- | --- | --- | --- | --- |
+| — | Image Quality Assessment for Machine-oriented Communication | Chunyi Li, Xiaoyue Ling, Farong Wen, Haoyang Li, Guo Lu, Weisi Lin, Xiao-Ping Zhang, Guangtao Zhai, Wenjun Zhang | 9 | IEEE TPAMI | 2026 | — | — | user-confirmed | user-confirmed | journal | include | Guo Lu confirmed IEEE TPAMI acceptance and corresponding authorship on 2026-10-27; title and author order supplied in the manuscript screenshot; no publication link supplied. |
 | — | Dual-Representation Image Compression at Ultra-Low Bitrates via Explicit Semantics and Implicit Textures | Chuqin Zhou, Xiaoyue Ling, Yunuo Chen, Jincheng Dai, Guo Lu, Wenjun Zhang | 6 | IEEE T-CSVT | 2026 | — | — | user-confirmed | user-confirmed | journal | include | Guo Lu confirmed the IEEE T-CSVT 2026 acceptance and author order; no formal publication link supplied. |
 | — | Compressing 3D Gaussian Splatting via Cross-Representation Priors | Yezheng Zhang, Huanxiong Liang, Chuqin Zhou, Guo Lu, Wenjun Zhang | 5 | IEEE TIP | 2026 | — | — | user-confirmed | user-confirmed | journal | include | Guo Lu confirmed the IEEE TIP 2026 publication, author order, and corresponding-author role; no formal publication link supplied. |
 | Loss-Resilient Semantic Communication over Packet-Loss Networks at Extreme-Low Bandwidth | Loss-Resilient Semantic Communication over Packet-Loss Networks at Extreme-Low Bandwidth | Shengshi Yao, Jincheng Dai, Sixian Wang, Guo Lu, Kai Niu, Wenjun Xu, Wenjun Zhang, Ping Zhang | 8 | IEEE TMC | 2026 | https://doi.org/10.1109/tmc.2026.3726512 | https://doi.org/10.1109/tmc.2026.3726512 | https://doi.org/10.1109/tmc.2026.3726512 | publisher | journal | include | — |
